@@ -21,7 +21,9 @@
         <activity
             android:name=".MainMenuActivity"
             android:label="@string/title_activity_main_menu"></activity>
-        <activity android:name=".LoadSessionActivity">
+        <activity
+            android:name=".LoadSessionActivity"
+            android:label="iOPD">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
