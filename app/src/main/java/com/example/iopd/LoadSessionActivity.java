@@ -1,13 +1,18 @@
 package com.example.iopd;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class MainActivity extends AppCompatActivity {
+public class LoadSessionActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Intent intent = new Intent(LoadSessionActivity.this,MainMenuActivity.class);
+        startActivity(intent);
+        finish();
     }
 }
