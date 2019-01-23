@@ -2,6 +2,7 @@ package com.example.iopd;
 
 import android.Manifest;
 import android.app.Fragment;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.Window;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainMenuActivity extends AppCompatActivity {
 
@@ -29,6 +31,8 @@ public class MainMenuActivity extends AppCompatActivity {
     private static Double lati1, lati2, logi1, logi2;
     private boolean queue, area;
     private FirebaseInstanceIdService firebaseInstanceIdService;
+    private int backButtonCount;
+    private int currentPage;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -64,6 +68,8 @@ public class MainMenuActivity extends AppCompatActivity {
         logi2 = 50.0;
         area = false;
         queue = false;
+        backButtonCount =0;
+        currentPage =0;
 
         mViewPage = findViewById(R.id.fragment);
         mSectionsStatePagerAdapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
@@ -131,27 +137,32 @@ public class MainMenuActivity extends AppCompatActivity {
             mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(new HomeFragment(),"Home");
+            currentPage = 0;
             mViewPage.setAdapter(adapter);
         }else if(page == 1){
             mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(new PlaceFragment(),"Suggestion location");
             mViewPage.setAdapter(adapter);
+            currentPage = 1;
         }else if(page == 2){
             mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(new NotificationFragment(),"Notification");
             mViewPage.setAdapter(adapter);
+            currentPage =2;
         }else if(page == 3){
             mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(new ProcessFragment(),"Progress");
             mViewPage.setAdapter(adapter);
+            currentPage = 3;
         }else if(page == 4){
             mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(new Place2Fragment(),"Progress");
             mViewPage.setAdapter(adapter);
+            currentPage = 4;
         }
     }
 
@@ -163,6 +174,36 @@ public class MainMenuActivity extends AppCompatActivity {
             if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
                 locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 0, 0, locationListener);
             }
+        }
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        if(backButtonCount >= 1)
+        {
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            backButtonCount =0;
+            finish();
+        }
+        else if(currentPage == 0){
+            Toast.makeText(this, "Press the back button once again to close the application.", Toast.LENGTH_SHORT).show();
+            backButtonCount++;
+        }else  if(currentPage == 1){
+            setViewPager(0);
+            backButtonCount =0;
+        }else  if(currentPage == 2){
+            setViewPager(0);
+            backButtonCount =0;
+        }else  if(currentPage == 3){
+            setViewPager(0);
+            backButtonCount =0;
+        }else  if(currentPage == 4){
+            setViewPager(1);
+            backButtonCount =0;
         }
     }
 
