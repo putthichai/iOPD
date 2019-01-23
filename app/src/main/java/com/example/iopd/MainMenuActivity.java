@@ -147,6 +147,11 @@ public class MainMenuActivity extends AppCompatActivity {
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(new ProcessFragment(),"Progress");
             mViewPage.setAdapter(adapter);
+        }else if(page == 4){
+            mViewPage.removeAllViews();
+            SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
+            adapter.addFragment(new Place2Fragment(),"Progress");
+            mViewPage.setAdapter(adapter);
         }
     }
 
