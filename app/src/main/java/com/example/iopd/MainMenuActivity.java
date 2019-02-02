@@ -20,6 +20,8 @@ import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.storage.FirebaseStorage;
+
 public class MainMenuActivity extends AppCompatActivity {
 
     private TextView mTextMessage;
@@ -33,6 +35,7 @@ public class MainMenuActivity extends AppCompatActivity {
     private FirebaseInstanceIdService firebaseInstanceIdService;
     private int backButtonCount;
     private int currentPage;
+    private Patient patient;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -62,6 +65,11 @@ public class MainMenuActivity extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main_menu);
 
+        //create patient
+        patient = new Patient(0,"test", "test");
+
+
+        //set area of the hospital
         lati1 = 0.0;
         lati2 = 10.0;
         logi1 = -100.0;
@@ -71,10 +79,10 @@ public class MainMenuActivity extends AppCompatActivity {
         backButtonCount =0;
         currentPage =0;
 
+        //setup page
         mViewPage = findViewById(R.id.fragment);
         mSectionsStatePagerAdapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
         setupViewPager(mViewPage);
-
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
@@ -88,7 +96,11 @@ public class MainMenuActivity extends AppCompatActivity {
                     area = true;
                     //Call function request for notification
 
+
+
                 }
+
+                //test value of location
                 Log.i("Location  aaaaa", location.toString());
             }
 
@@ -126,12 +138,14 @@ public class MainMenuActivity extends AppCompatActivity {
 
     }
 
+    //first setup
     private void setupViewPager(ViewPager viewPager){
         SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new HomeFragment(),"Home");
         viewPager.setAdapter(adapter);
     }
 
+    //change page
     public void setViewPager(int page){
         if(page == 0){
             mViewPage.removeAllViews();
@@ -177,6 +191,7 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
 
+    //set value back bottom
     @Override
     public void onBackPressed()
     {
@@ -187,7 +202,6 @@ public class MainMenuActivity extends AppCompatActivity {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             backButtonCount =0;
-            finish();
         }
         else if(currentPage == 0){
             Toast.makeText(this, "Press the back button once again to close the application.", Toast.LENGTH_SHORT).show();
