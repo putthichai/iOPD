@@ -47,9 +47,6 @@ public class MainMenuActivity extends AppCompatActivity {
                 case R.id.action_notification:
                     setViewPager(2);
                     return true;
-                case R.id.action_navigation:
-
-                    return true;
             }
             return false;
         }
@@ -83,7 +80,7 @@ public class MainMenuActivity extends AppCompatActivity {
             gps = new GPSTracker(this);
             double latitude = gps.getLatitude();
             double longitude = gps.getLongitude();
-            right.setText(latitude+"  "+longitude);
+            //right.setText(latitude+"  "+longitude);
 
     }
 

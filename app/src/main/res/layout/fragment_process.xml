@@ -76,19 +76,19 @@
                     android:id="@+id/textView141"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TextView" />
+                    android:text="-" />
 
                 <TextView
                     android:id="@+id/textView151"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TextView" />
+                    android:text="-" />
 
                 <TextView
                     android:id="@+id/textView171"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TextView" />
+                    android:text="-" />
 
             </LinearLayout>
 
@@ -158,19 +158,19 @@
                     android:id="@+id/textView142"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TextView" />
+                    android:text="-" />
 
                 <TextView
                     android:id="@+id/textView152"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TextView" />
+                    android:text="-" />
 
                 <TextView
                     android:id="@+id/textView172"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TextView" />
+                    android:text="-" />
 
             </LinearLayout>
         </LinearLayout>
@@ -239,19 +239,19 @@
                     android:id="@+id/textView143"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TextView" />
+                    android:text="-" />
 
                 <TextView
                     android:id="@+id/textView153"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TextView" />
+                    android:text="-" />
 
                 <TextView
                     android:id="@+id/textView173"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TextView" />
+                    android:text="-" />
 
             </LinearLayout>
         </LinearLayout>
@@ -320,19 +320,19 @@
                     android:id="@+id/textView144"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TextView" />
+                    android:text="-" />
 
                 <TextView
                     android:id="@+id/textView154"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TextView" />
+                    android:text="-" />
 
                 <TextView
                     android:id="@+id/textView174"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TextView" />
+                    android:text="-" />
 
             </LinearLayout>
         </LinearLayout>
