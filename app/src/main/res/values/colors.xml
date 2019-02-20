@@ -3,10 +3,12 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#03A9F4</color>
     <color name="colorAccent">#D81B60</color>
-    <color name="userLayout">#05f4fc</color>
-    <color name="menuLayout">#05f4fc</color>
+    <color name="userLayout">#66DEF9</color>
+    <color name="menuLayout">#66DEF9</color>
     <color name="itemAble">#8c8c8c</color>
     <color name="itemDis">#feffff</color>
     <color name="lineTimelineC">#363636</color>
     <color name="lineTimelineN">#363636</color>
+    <color name="avatar_bg">#DBDEE1</color>
+    <color name="background_main">#FFF6DD</color>
 </resources>
