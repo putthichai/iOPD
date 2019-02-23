@@ -31,8 +31,16 @@
                     android:layout_width="141dp"
                     android:layout_height="98dp"
                     android:layout_marginStart="8dp"
+
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/imageView3"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/appoi" />
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -94,7 +102,8 @@
 
                     <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:background="@drawable/wooden">
 
                         <TextView
                             android:id="@+id/textView107"
@@ -133,8 +142,10 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:background="@drawable/orange_paper"
+                        android:scaleType="fitXY">
 
                         <TextView
                             android:id="@+id/textView12"
@@ -195,37 +206,48 @@
                 app:layout_constraintVertical_bias="0.0">
 
                 <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_width="403dp"
+                    android:layout_height="106dp"
+                    android:background="@drawable/blur_rest">
 
                     <TextView
                         android:id="@+id/textView16"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
-                        android:layout_centerVertical="true"
+                        android:layout_centerInParent="true"
                         android:text="สถานที่ในโรงพยาบาล"
                         android:textAlignment="center"
                         android:textSize="18sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"/>
                 </RelativeLayout>
 
             </android.support.v7.widget.CardView>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                >
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/setting"
-                    android:layout_width="109dp"
-                    android:layout_height="75dp"
+                    android:layout_width="90dp"
+                    android:layout_height="80dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
+                    android:background="@drawable/settings"
+
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/imageView4"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/settings" />
 
                     <TextView
                         android:id="@+id/textView2"

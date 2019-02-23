@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 
@@ -18,7 +19,7 @@ import android.widget.TextView;
  */
 public class PlaceFragment extends Fragment {
 
-    public GridView mgridView;
+    private GridView mgridView;
 
 
     public PlaceFragment() {
@@ -47,7 +48,7 @@ public class PlaceFragment extends Fragment {
 
 class GridAdapter extends BaseAdapter {
     Context context;
-    String string="123456789";
+
 
     public GridAdapter(Context c){
         context = c;
@@ -55,12 +56,12 @@ class GridAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return string.length();
+        return mThumbIds.length;
     }
 
     @Override
     public Object getItem(int position) {
-        return string.charAt(position);
+        return null;
     }
 
     @Override
@@ -70,8 +71,21 @@ class GridAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View view, ViewGroup viewGroup) {
-        TextView textView = new TextView(context);
-        textView.setText(String.valueOf(string.charAt(position)));
-        return textView;
+        ImageView imageView;
+        if(view == null){
+            imageView = new ImageView(context);
+            imageView.setLayoutParams(new GridView.LayoutParams(250, 200));
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            imageView.setPadding(6, 6, 6, 6);
+        }else{
+            imageView = (ImageView) view;
+        }
+        imageView.setImageResource(mThumbIds[position]);
+        return imageView;
     }
+
+    private Integer[] mThumbIds = {
+            R.drawable.sl1, R.drawable.sl2,
+            R.drawable.sl3, R.drawable.sl4,
+    };
 }

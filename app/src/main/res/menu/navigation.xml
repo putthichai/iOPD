@@ -12,9 +12,5 @@
         />
 
 
-    <item   android:title= "Navigation"
-        android:id="@+id/action_navigation"
-        android:icon="@drawable/icons8_gps_100"
-        />
 
 </menu>
