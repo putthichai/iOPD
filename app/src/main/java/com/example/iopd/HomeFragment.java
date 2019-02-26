@@ -14,7 +14,14 @@ import android.widget.TextView;
  * A simple {@link Fragment} subclass.
  */
 public class HomeFragment extends Fragment {
-    private TextView queue,date,time,doing,where,when,name,right;
+    protected TextView queue;
+    protected TextView date;
+    protected TextView time;
+    protected TextView doing;
+    protected TextView where;
+    protected TextView when;
+    protected TextView name;
+    protected TextView right;
     private CardView suggestion,process;
     private int stateForTrement;
 
@@ -68,6 +75,10 @@ public class HomeFragment extends Fragment {
             queue.setText("-");
             when.setText("-");
         }
+    }
+
+    protected void updateQueue(int tempInt){
+        queue.setText(String.valueOf(tempInt));
     }
 
 

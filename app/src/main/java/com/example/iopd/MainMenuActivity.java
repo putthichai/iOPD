@@ -22,29 +22,12 @@ import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.storage.FirebaseStorage;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ExecutionException;
-
-import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class MainMenuActivity extends AppCompatActivity {
 
     private static final String TAG = "";
+    private static int queueNo;
     private TextView mTextMessage;
     private ViewPager mViewPage;
     private SectionsStatePagerAdapter mSectionsStatePagerAdapter;
@@ -60,6 +43,10 @@ public class MainMenuActivity extends AppCompatActivity {
     private static Patient patient;
     private LocationListener locationListener;
     private LocationManager locationManager;
+    private static HomeFragment home;
+    private NotificationFragment notification;
+    private ProcessFragment process;
+    private PlaceFragment place;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -103,6 +90,12 @@ public class MainMenuActivity extends AppCompatActivity {
         //setup page
         mViewPage = findViewById(R.id.fragment);
         mSectionsStatePagerAdapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
+
+        home = new HomeFragment();
+        notification = new NotificationFragment();
+        process = new ProcessFragment();
+        place = new PlaceFragment();
+
         setupViewPager(mViewPage);
         right = findViewById(R.id.right);
 
@@ -117,7 +110,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
                 Double latitude = location.getLatitude();
                 Double longitude = location.getLongitude();
-                Log.i("aaaaaaa Bookmark","aaaaaaaa "+location.getLatitude()+"     "+location.getLongitude());
+                //.i("aaaaaaa Bookmark","aaaaaaaa "+location.getLatitude()+"     "+location.getLongitude());
                 if(latitude >= lati1 && latitude <= lati2 && longitude >= logi1 && longitude <= logi2){
                     area = true;
                     //Call function request for notification
@@ -125,7 +118,6 @@ public class MainMenuActivity extends AppCompatActivity {
                     //Log.i("Location  aaaaa", location.toString());
 
                 }
-
             }
 
             @Override
@@ -142,6 +134,9 @@ public class MainMenuActivity extends AppCompatActivity {
             public void onProviderDisabled(String provider) {
 
             }
+
+
+
         };
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -181,38 +176,38 @@ public class MainMenuActivity extends AppCompatActivity {
     //first setup
     private void setupViewPager(ViewPager viewPager){
         SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new HomeFragment(),"Home");
+        adapter.addFragment(home,"Home");
         viewPager.setAdapter(adapter);
     }
 
     //change page
     public void setViewPager(int page){
         if(page == 0){
-            mViewPage.removeAllViews();
+            //mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
-            adapter.addFragment(new HomeFragment(),"Home");
+            adapter.addFragment(home,"Home");
             currentPage = 0;
             mViewPage.setAdapter(adapter);
         }else if(page == 1){
-            mViewPage.removeAllViews();
+            //mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
-            adapter.addFragment(new PlaceFragment(),"Suggestion location");
+            adapter.addFragment(place,"Suggestion location");
             mViewPage.setAdapter(adapter);
             currentPage = 1;
         }else if(page == 2){
-            mViewPage.removeAllViews();
+            //mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
-            adapter.addFragment(new NotificationFragment(),"Notification");
+            adapter.addFragment(notification,"Notification");
             mViewPage.setAdapter(adapter);
             currentPage =2;
         }else if(page == 3){
-            mViewPage.removeAllViews();
+            //mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
-            adapter.addFragment(new ProcessFragment(),"Progress");
+            adapter.addFragment(process,"Progress");
             mViewPage.setAdapter(adapter);
             currentPage = 3;
         }else if(page == 4){
-            mViewPage.removeAllViews();
+            //mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(new Place2Fragment(),"Progress");
             mViewPage.setAdapter(adapter);
@@ -252,19 +247,36 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     protected static void bookmarkQueue()  {
-        Log.i("aaaaaaa Bookmark","aaaaaaa Bookmark");
+       // Log.i("aaaaaaa Bookmark","aaaaaaa Bookmark");
         CallApi getAppointment = new CallApi(patient.getId());
         getAppointment.execute("getAppointmentList");
-        int temp = getAppointment.getAppointmentId();
-        Log.i("aaaaaaa Bookmark","aaaaaaa Bookmark "+temp);
-        if(temp == -1){
+        int tempAppointment = getAppointment.getAppointmentId();
+        int tempEmployee = getAppointment.getEmployeeid();
+       // Log.i("aaaaaaa Bookmark","aaaaaaa Bookmark "+tempAppointment);
+        if(tempAppointment == -1){
 
         }else {
-            if(queue == false){
-                CallApi getRoomScheduleByPatientId =  new CallApi(patient.getId());
-                getRoomScheduleByPatientId.execute("getRoomScheduleByPatientId");
-                queue = true;
-                Log.d(TAG,"aaaaaaa have appointment");
+            if(queue == false && tempEmployee != 0){
+                Log.d("aaaaaaaaaa main emId","aaaaaaaaaa main emId"+tempEmployee);
+                CallApi getRoomScheduleByPatientId =  new CallApi(tempEmployee);
+                getRoomScheduleByPatientId.execute("getRoomScheduleByEmployeeId");
+                int temproomid = getRoomScheduleByPatientId.getRoomid();
+                Log.d("aaaaaaaaaaaa","aaaaa main room "+temproomid+"  queue T/F "+queue);
+                if(temproomid != 0){
+                    BookmarkQueue bookmarkQueue = new BookmarkQueue(patient.getId(),temproomid, tempAppointment);
+                    bookmarkQueue.execute("http://iopd.ml/?function=addQueue");
+                    Log.d("qqqqqq","qqqqqq pId "+patient.getId()+"     roomId "+temproomid+"    Appoint "+tempAppointment);
+                    Log.d("qqqqqqqqqq","qqqqqq return  "+bookmarkQueue.getQueueNo());
+                    queueNo = bookmarkQueue.getQueueNo();
+                    if(queueNo != 0){
+                        home.updateQueue(queueNo);
+                        Log.d("qqqqqqq","qqqqqqq queueNo "+queueNo);
+                        Log.d(TAG,"aaaaaaa have appointment");
+                        queue = true;
+                    }
+
+                }
+
             }
         }
 
@@ -277,6 +289,7 @@ public class MainMenuActivity extends AppCompatActivity {
        // temp = getAppointment.getvalue();
 
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
