@@ -2,11 +2,13 @@ package com.example.iopd;
 
 import android.Manifest;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -22,19 +24,42 @@ import android.widget.Toast;
 
 import com.google.firebase.storage.FirebaseStorage;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
+
+import static androidx.constraintlayout.widget.Constraints.TAG;
+
 public class MainMenuActivity extends AppCompatActivity {
 
+    private static final String TAG = "";
     private TextView mTextMessage;
     private ViewPager mViewPage;
     private SectionsStatePagerAdapter mSectionsStatePagerAdapter;
     public static String tvLogi, tvLati;
     private static Double lati1, lati2, logi1, logi2;
-    private boolean queue, area;
+    private static boolean queue;
+    private boolean area;
     private FirebaseInstanceIdService firebaseInstanceIdService;
     private int backButtonCount;
     private int currentPage;
     private TextView right;
     private GPSTracker gps;
+    private static Patient patient;
+    private LocationListener locationListener;
+    private LocationManager locationManager;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -62,7 +87,7 @@ public class MainMenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_menu);
 
         //create patient
-        patient = new Patient(0,"test", "test");
+        patient = new Patient(2, "test", "test");
 
 
         //set area of the hospital
@@ -85,18 +110,73 @@ public class MainMenuActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         firebaseInstanceIdService = new FirebaseInstanceIdService();
 
-            gps = new GPSTracker(this);
-            double latitude = gps.getLatitude();
-            double longitude = gps.getLongitude();
+        locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+                Double latitude = location.getLatitude();
+                Double longitude = location.getLongitude();
+                Log.i("aaaaaaa Bookmark","aaaaaaaa "+location.getLatitude()+"     "+location.getLongitude());
+                if(latitude >= lati1 && latitude <= lati2 && longitude >= logi1 && longitude <= logi2){
+                    area = true;
+                    //Call function request for notification
+                    bookmarkQueue();
+                    //Log.i("Location  aaaaa", location.toString());
+
+                }
+
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+            return;
+        }
+        locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 0, 0, locationListener);
+
+
+
+            //new BookmarkQueue(this).execute();
+    /*        gps = new GPSTracker(this);
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                //your method
+                gps.onLocationChanged(gps.getLocation());
+                Log.d(TAG,"aaaaaaaaaa time+++ ");
+
+
+            }
+        }, 0, 5000);
+            gps.onLocationChanged(gps.getLocation());
+            checklocation();
             //right.setText(latitude+"  "+longitude);
-
+            //bookmarkQueue();*/
     }
 
-    protected void checklocation(){
-        double latitude = gps.getLatitude();
-        double longitude = gps.getLongitude();
-        right.setText(latitude+"  "+longitude);
-    }
 
     //first setup
     private void setupViewPager(ViewPager viewPager){
@@ -168,6 +248,44 @@ public class MainMenuActivity extends AppCompatActivity {
         }else  if(currentPage == 4){
             setViewPager(1);
             backButtonCount =0;
+        }
+    }
+
+    protected static void bookmarkQueue()  {
+        Log.i("aaaaaaa Bookmark","aaaaaaa Bookmark");
+        CallApi getAppointment = new CallApi(patient.getId());
+        getAppointment.execute("getAppointmentList");
+        int temp = getAppointment.getAppointmentId();
+        Log.i("aaaaaaa Bookmark","aaaaaaa Bookmark "+temp);
+        if(temp == -1){
+
+        }else {
+            if(queue == false){
+                CallApi getRoomScheduleByPatientId =  new CallApi(patient.getId());
+                getRoomScheduleByPatientId.execute("getRoomScheduleByPatientId");
+                queue = true;
+                Log.d(TAG,"aaaaaaa have appointment");
+            }
+        }
+
+        // Toast.makeText(this, ""+appointmentId, Toast.LENGTH_SHORT).show();
+
+
+
+        //String temp = getAppointment.jobj.toString(1);
+
+       // temp = getAppointment.getvalue();
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 0, 0, locationListener);
+            }
         }
     }
 

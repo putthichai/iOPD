@@ -1,6 +1,7 @@
 package com.example.iopd;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Context;
@@ -13,8 +14,12 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
+
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class GPSTracker extends Service implements LocationListener {
 
@@ -42,9 +47,23 @@ public class GPSTracker extends Service implements LocationListener {
     // Declaring a Location Manager
     protected LocationManager locationManager;
 
+
+
     public GPSTracker(Context context) {
         this.mContext = context;
         getLocation();
+       /* new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                //your method
+                onLocationChanged(getLocation());
+                Log.d(TAG,"aaaaaaaaaa time");
+
+            }
+        }, 0, 5000);*/
+
+
+
     }
 
     @SuppressLint("MissingPermission")
@@ -186,9 +205,15 @@ public class GPSTracker extends Service implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         float bestAccuracy = -1f;
+        Log.d("","aaaaaa location change");
         if (location.getAccuracy() != 0.0f
                 && (location.getAccuracy() < bestAccuracy) || bestAccuracy == -1f) {
+            Log.d(TAG,"aaaaaaa"+latitude+"      "+longitude);
             locationManager.removeUpdates(this);
+            Log.d(TAG,"aaaaaa  location   "+location.getLatitude()+"   "+location.getLongitude());
+            Log.d(TAG,"aaaaaaa"+latitude+"      "+longitude);
+            //new MainMenuActivity().checklocation();
+
         }
         bestAccuracy = location.getAccuracy();
     }

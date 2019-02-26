@@ -1,58 +1,34 @@
 package com.example.iopd;
 
 
+import android.content.Context;
+import android.os.AsyncTask;
+import android.util.Log;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Date;
 import java.util.Calendar;
 
-public class BookmarkQueue {
+import static android.content.ContentValues.TAG;
 
-    private String url ="http://iopd.ml/?function=";
-    private int appointmentId, doctorId, patientId;
-    public BookmarkQueue(int id) {
-        patientId = id;
-        try{
-            appointmentId = checkAppointment(id);
-            URL link = new URL(url+"getAppointment");
-            HttpURLConnection urlConnection = (HttpURLConnection) link.openConnection();
+public class BookmarkQueue extends AsyncTask<Void, Void, Void> {
 
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+    private Context mContext;
 
-
+    public BookmarkQueue(Context context){
+        mContext = context;
     }
 
-    private int checkAppointment(int id){
-        int appointmentId =0;
+    @Override
+    protected Void doInBackground(Void... voids) {
+        GPSTracker gps = new GPSTracker(mContext);
 
-        return appointmentId;
+        return null;
     }
-
-    class Appointment{
-        int appointmentId;
-        int patientId;
-        int doctorId;
-        Date appointmentDate;
-
-        public Appointment(int aid, int pid, int did, Date ad){
-            appointmentId = aid;
-            patientId = pid;
-            doctorId = did;
-            appointmentDate = ad;
-        }
-
-        public boolean haveAppointment(){
-            boolean appointment = false;
-
-
-
-            return appointment;
-        }
-
-    }
-
-
 }
+
 
