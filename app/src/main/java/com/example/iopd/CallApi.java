@@ -40,9 +40,16 @@ public class CallApi extends AsyncTask<String, Void, String> {
     private int size;
     private static int  appointmentid,employeeid,roomid;
     private int patientid;
+    private static double longtitude,latitude;
+    private static boolean inArea;
 
     public CallApi(int id){
         patientid = id;
+    }
+
+    public CallApi(double lati,double longti){
+        latitude = lati;
+        longtitude = longti;
     }
 
     @Override
@@ -137,45 +144,66 @@ public class CallApi extends AsyncTask<String, Void, String> {
               int tempsbatLast = sb.length();
               String temp = sb.toString().substring(24,tempsbatLast-2);
 
-              //Log.d(ContentValues.TAG,"ssssssss string "+temp);
               jobj = new JSONObject(temp);
-              //Log.d("sssssss","ssssss json create"+jobj.toString());
-              //Log.d(ContentValues.TAG,"aaaaaaa room size"+jobj.getInt("roomId"));
-              //size = jobj.getJSONArray("results").length();
               roomid = jobj.getInt("roomId");
-             // Log.d("ssssss room ","ssssss room check size"+jobj.getInt("roomId"));
 
-            /*  HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-              conn.setRequestMethod("GET");
+
+          }else if(function == "CheckInArea"){
+
+             // Log.d(TAG,"lllllll strat check in area la"+latitude+"   long"+longtitude);
+
+              String data = URLEncoder.encode("latpatient", "UTF-8")
+                      + "=" + URLEncoder.encode(String.valueOf(latitude), "UTF-8");
+
+              data += "&" + URLEncoder.encode("longpatient", "UTF-8") + "="
+                      + URLEncoder.encode(String.valueOf(longtitude), "UTF-8");
+
+              HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+              conn.setRequestMethod("POST");
               conn.setReadTimeout(10000);
               conn.setReadTimeout(15000);
+              conn.setUseCaches(false);
+              conn.setDoOutput(true);
               conn.setDoInput(true);
 
-              InputStream in = conn.getInputStream();
-              BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-              String line = "";
-              while ((line = reader.readLine()) != null) {
-                  //Log.d("bbbbbb",line);
-                  buffer.append(line);
+              OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+              wr.write( data );
+              wr.flush();
+
+
+              BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+              StringBuilder sb = new StringBuilder();
+              String line = null;
+
+              // Read Server Response
+              while((line = reader.readLine()) != null)
+              {
+                  // Append server response in string
+                  sb.append(line + "\n");
               }
-              Log.d(TAG, "doInBackground:aaaaaa "+buffer.toString());
-              in.close();
-              reader.close();
+
               conn.disconnect();
+              wr.close();
+              reader.close();
 
-              jobj = new JSONObject(buffer.toString());
-              size = jobj.getJSONArray("results").length();
-                Log.d("aaaaaaaaa room ","aaaaaaaaa room "+size);
-              for(int i = 0; i < size;  i++){
-                  Log.d(TAG, "doInBackground:aaaaa test Json"+jobj.getJSONArray("results").getJSONObject(i).getInt("patientId"));
+              jobj = new JSONObject(sb.toString());
 
-                  if(jobj.getJSONArray("results").getJSONObject(i).getInt("doctor_id") == patientid){
-                        roomid = jobj.getJSONArray("results").getJSONObject(i).getInt("place_id");
-                        Log.d("aaaaaaa roomId ","aaaaaaa roomId "+roomid);
-                  }
+             // Log.d(TAG,"lllll  "+jobj.getInt("result"));
 
+              if(jobj.getInt("result") == 1){
+                  inArea = true;
+              }else{
+                  inArea = false;
               }
-*/
+
+             // Log.d("llllllll","lllllllll la , lo"+sb.toString());
+
+             // int tempsbatLast = sb.length();
+              //String temp = sb.toString().substring(24,tempsbatLast-2);
+
+              //jobj = new JSONObject(temp);
+              //roomid = jobj.getInt("roomId");
+
 
           }
 
@@ -210,6 +238,10 @@ public class CallApi extends AsyncTask<String, Void, String> {
 
     public int getRoomid(){
         return roomid;
+    }
+
+    public boolean getInArea(){
+        return inArea;
     }
 
 }

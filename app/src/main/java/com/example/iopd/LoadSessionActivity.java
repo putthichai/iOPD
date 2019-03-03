@@ -13,6 +13,10 @@ public class LoadSessionActivity extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_loadsession);
 
+
+
+
+
         Intent intent = new Intent(LoadSessionActivity.this,MainMenuActivity.class);
         startActivity(intent);
         finish();

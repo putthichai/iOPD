@@ -28,18 +28,16 @@ public class MainMenuActivity extends AppCompatActivity {
 
     private static final String TAG = "";
     private static int queueNo;
-    private TextView mTextMessage;
     private ViewPager mViewPage;
-    private SectionsStatePagerAdapter mSectionsStatePagerAdapter;
     public static String tvLogi, tvLati;
     private static Double lati1, lati2, logi1, logi2;
     private static boolean queue;
-    private boolean area;
+    private static String stateDoing, targetLocation;
+    private static int remainQueue;
     private FirebaseInstanceIdService firebaseInstanceIdService;
     private int backButtonCount;
     private int currentPage;
     private TextView right;
-    private GPSTracker gps;
     private static Patient patient;
     private LocationListener locationListener;
     private LocationManager locationManager;
@@ -76,20 +74,13 @@ public class MainMenuActivity extends AppCompatActivity {
         //create patient
         patient = new Patient(2, "test", "test");
 
-
         //set area of the hospital
-        lati1 = 0.0;
-        lati2 = 10.0;
-        logi1 = -100.0;
-        logi2 = 50.0;
-        area = false;
         queue = false;
         backButtonCount =0;
         currentPage =0;
 
         //setup page
         mViewPage = findViewById(R.id.fragment);
-        mSectionsStatePagerAdapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
 
         home = new HomeFragment();
         notification = new NotificationFragment();
@@ -103,6 +94,18 @@ public class MainMenuActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         firebaseInstanceIdService = new FirebaseInstanceIdService();
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+            return;
+        }
+        Log.d("aaaaa","aaaa set P1");
         locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
@@ -110,14 +113,18 @@ public class MainMenuActivity extends AppCompatActivity {
 
                 Double latitude = location.getLatitude();
                 Double longitude = location.getLongitude();
-                //.i("aaaaaaa Bookmark","aaaaaaaa "+location.getLatitude()+"     "+location.getLongitude());
-                if(latitude >= lati1 && latitude <= lati2 && longitude >= logi1 && longitude <= logi2){
-                    area = true;
-                    //Call function request for notification
-                    bookmarkQueue();
-                    //Log.i("Location  aaaaa", location.toString());
+                Log.d("aaaaaaa Bookmark","aaaaaaaa "+location.getLatitude()+"     "+location.getLongitude());
 
-                }
+                    if(checkInArea(location) == true){
+
+                       // Log.d("zzzz","zzzzz bookmark  "+queueNo);
+
+                        if(queue == false) bookmarkQueue();
+                        //Call function request for notification
+                        //Log.i("Location  aaaaa", location.toString());
+
+                    }
+
             }
 
             @Override
@@ -139,37 +146,10 @@ public class MainMenuActivity extends AppCompatActivity {
 
         };
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
-            return;
-        }
+
         locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 0, 0, locationListener);
 
 
-
-            //new BookmarkQueue(this).execute();
-    /*        gps = new GPSTracker(this);
-        new Timer().scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                //your method
-                gps.onLocationChanged(gps.getLocation());
-                Log.d(TAG,"aaaaaaaaaa time+++ ");
-
-
-            }
-        }, 0, 5000);
-            gps.onLocationChanged(gps.getLocation());
-            checklocation();
-            //right.setText(latitude+"  "+longitude);
-            //bookmarkQueue();*/
     }
 
 
@@ -183,31 +163,47 @@ public class MainMenuActivity extends AppCompatActivity {
     //change page
     public void setViewPager(int page){
         if(page == 0){
-            //mViewPage.removeAllViews();
+            mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(home,"Home");
+            home.onStart();
+            place.onStop();
+            notification.onStop();
+            process.onStop();
             currentPage = 0;
             mViewPage.setAdapter(adapter);
         }else if(page == 1){
-            //mViewPage.removeAllViews();
+            mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(place,"Suggestion location");
+            home.onStop();
+            place.onStart();
+            notification.onStop();
+            process.onStop();
             mViewPage.setAdapter(adapter);
             currentPage = 1;
         }else if(page == 2){
-            //mViewPage.removeAllViews();
+            mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(notification,"Notification");
+            home.onDestroy();
+            place.onStop();
+            notification.onStart();
+            process.onStop();
             mViewPage.setAdapter(adapter);
             currentPage =2;
         }else if(page == 3){
-            //mViewPage.removeAllViews();
+            mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(process,"Progress");
+            home.onStop();
+            place.onStop();
+            notification.onStop();
+            process.onStart();
             mViewPage.setAdapter(adapter);
             currentPage = 3;
         }else if(page == 4){
-            //mViewPage.removeAllViews();
+            mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(new Place2Fragment(),"Progress");
             mViewPage.setAdapter(adapter);
@@ -247,7 +243,7 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     protected static void bookmarkQueue()  {
-       // Log.i("aaaaaaa Bookmark","aaaaaaa Bookmark");
+        Log.i("aaaaaaa Bookmark","aaaaaaa Bookmark");
         CallApi getAppointment = new CallApi(patient.getId());
         getAppointment.execute("getAppointmentList");
         int tempAppointment = getAppointment.getAppointmentId();
@@ -257,7 +253,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
         }else {
             if(queue == false && tempEmployee != 0){
-                Log.d("aaaaaaaaaa main emId","aaaaaaaaaa main emId"+tempEmployee);
+               // Log.d("aaaaaaaaaa main emId","aaaaaaaaaa main emId"+tempEmployee);
                 CallApi getRoomScheduleByPatientId =  new CallApi(tempEmployee);
                 getRoomScheduleByPatientId.execute("getRoomScheduleByEmployeeId");
                 int temproomid = getRoomScheduleByPatientId.getRoomid();
@@ -265,7 +261,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 if(temproomid != 0){
                     BookmarkQueue bookmarkQueue = new BookmarkQueue(patient.getId(),temproomid, tempAppointment);
                     bookmarkQueue.execute("http://iopd.ml/?function=addQueue");
-                    Log.d("qqqqqq","qqqqqq pId "+patient.getId()+"     roomId "+temproomid+"    Appoint "+tempAppointment);
+                   // Log.d("qqqqqq","qqqqqq pId "+patient.getId()+"     roomId "+temproomid+"    Appoint "+tempAppointment);
                     Log.d("qqqqqqqqqq","qqqqqq return  "+bookmarkQueue.getQueueNo());
                     queueNo = bookmarkQueue.getQueueNo();
                     if(queueNo != 0){
@@ -280,14 +276,14 @@ public class MainMenuActivity extends AppCompatActivity {
             }
         }
 
-        // Toast.makeText(this, ""+appointmentId, Toast.LENGTH_SHORT).show();
+    }
 
-
-
-        //String temp = getAppointment.jobj.toString(1);
-
-       // temp = getAppointment.getvalue();
-
+    public static boolean checkInArea(Location location){
+        CallApi inArea = new CallApi(location.getLatitude(),location.getLongitude());
+        inArea.execute("CheckInArea");
+        Boolean temp = inArea.getInArea();
+        //Log.d("zzzzzz","zzzzzztemp  T/F"+temp);
+        return temp;
     }
 
 
@@ -301,5 +297,22 @@ public class MainMenuActivity extends AppCompatActivity {
             }
         }
     }
+
+    protected static int getQueueNo(){
+        return queueNo;
+    }
+
+    protected static String getState(){
+        return stateDoing;
+    }
+
+    protected static String getTargetLocation(){
+        return targetLocation;
+    }
+
+    protected static int getRemainQueue(){
+        return remainQueue;
+    }
+
 
 }

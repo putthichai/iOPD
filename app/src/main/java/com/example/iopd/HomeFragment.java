@@ -4,16 +4,19 @@ package com.example.iopd;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class HomeFragment extends Fragment {
+    private static final String TAG = "";
     protected TextView queue;
     protected TextView date;
     protected TextView time;
@@ -48,7 +51,9 @@ public class HomeFragment extends Fragment {
         date = root.findViewById(R.id.apDate);
         process = root.findViewById(R.id.processLayer);
 
-        changeState(stateForTrement);
+
+        //queue.setText(MainMenuActivity.getQueueNo());
+
 
         suggestion.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,18 +73,28 @@ public class HomeFragment extends Fragment {
     }
 
 
-    public void changeState(int state){
-        if(state == 0){
-            where.setText("-");
-            doing.setText("-");
-            queue.setText("-");
-            when.setText("-");
+    public void changeState(String state, String place, int remain){
+
+        Log.d("pppppp","PPPP state "+state+" place "+place+" remain "+remain);
+        if(state == null){
+            state = "-";
         }
+        if(place == null){
+            place = "-";
+        }
+        where.setText(place);
+        doing.setText(state);
+        when.setText(String.valueOf(remain));
     }
 
     protected void updateQueue(int tempInt){
         queue.setText(String.valueOf(tempInt));
     }
 
-
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateQueue(MainMenuActivity.getQueueNo());
+        changeState(MainMenuActivity.getState(), MainMenuActivity.getTargetLocation(), MainMenuActivity.getRemainQueue());
+    }
 }

@@ -52,18 +52,6 @@ public class GPSTracker extends Service implements LocationListener {
     public GPSTracker(Context context) {
         this.mContext = context;
         getLocation();
-       /* new Timer().scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                //your method
-                onLocationChanged(getLocation());
-                Log.d(TAG,"aaaaaaaaaa time");
-
-            }
-        }, 0, 5000);*/
-
-
-
     }
 
     @SuppressLint("MissingPermission")
