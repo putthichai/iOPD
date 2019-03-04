@@ -109,7 +109,7 @@ public class CallApi extends AsyncTask<String, Void, String> {
 
           }else if(function == "getRoomScheduleByEmployeeId"){
 
-              Log.d(TAG,"aaaaaa Room employee "+patientid);
+             // Log.d(TAG,"aaaaaa Room employee "+patientid);
 
               String data = URLEncoder.encode("employee_id", "UTF-8")
                       + "=" + URLEncoder.encode(String.valueOf(patientid), "UTF-8");
@@ -135,7 +135,7 @@ public class CallApi extends AsyncTask<String, Void, String> {
               while((line = reader.readLine()) != null)
               {
                   // Append server response in string
-                  Log.d(TAG,"bbbbbb loop "+line+"\n");
+                 // Log.d(TAG,"bbbbbb loop "+line+"\n");
                   sb.append(line + "\n");
               }
 

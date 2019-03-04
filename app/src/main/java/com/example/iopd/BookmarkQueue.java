@@ -41,11 +41,11 @@ public class BookmarkQueue extends AsyncTask<String, Void, Void> {
     @Override
     protected Void doInBackground(String... strings) {
         try {
-            Log.d(TAG,"222222222   roomId "+roomId+" appoint "+appointmentId);
+            //Log.d(TAG,"222222222   roomId "+roomId+" appoint "+appointmentId);
 
             if(roomId == 0 || appointmentId == 0) return null;
 
-            Log.d(TAG,"222222222 pass   roomId "+roomId+" appoint "+appointmentId);
+           // Log.d(TAG,"222222222 pass   roomId "+roomId+" appoint "+appointmentId);
             String data = URLEncoder.encode("patient_id", "UTF-8")
                     + "=" + URLEncoder.encode(String.valueOf(patientId), "UTF-8");
 
@@ -96,7 +96,7 @@ public class BookmarkQueue extends AsyncTask<String, Void, Void> {
 
             JSONObject jobj = new JSONObject(temp);
             queueNo = jobj.getInt("queueNo");
-            Log.d("333333","3333333   "+queueNo);
+           // Log.d("333333","3333333   "+queueNo);
             return null;
         }
         catch(Exception ex)

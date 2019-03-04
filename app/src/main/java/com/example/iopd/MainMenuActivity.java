@@ -104,14 +104,13 @@ public class MainMenuActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
             return;
         }
-        Log.d("aaaaa","aaaa set P1");
         locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
 
                     if(checkInArea(location) == true && queue == false){
-                        Log.d("111111","start bookmark queue "+queue+" queueNo "+queueNo);
+                        //Log.d("111111","start bookmark queue "+queue+" queueNo "+queueNo);
                         bookmarkQueue();
                     }
 
@@ -132,7 +131,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
             }
         };
-        locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 0, 0, locationListener);
+        locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 1, 0, locationListener);
     }
 
 
@@ -225,8 +224,9 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
 
-    protected static void bookmarkQueue() {
-        int temproomid = 0;
+    protected static void bookmarkQueue(){
+       // Log.d("bbbbbbbb","bbbbbbb start bookmark");
+        int temproomid;
         CallApi getAppointment = new CallApi(patient.getId());
         getAppointment.execute("getAppointmentList");
         int tempAppointment = getAppointment.getAppointmentId();
@@ -238,18 +238,18 @@ public class MainMenuActivity extends AppCompatActivity {
                 CallApi getRoomScheduleByPatientId =  new CallApi(tempEmployee);
                 getRoomScheduleByPatientId.execute("getRoomScheduleByEmployeeId");
                 temproomid = getRoomScheduleByPatientId.getRoomid();
-                //Log.d("aaaaaaaaaaaa","aaaaa main room "+temproomid+"  queue T/F "+queu  && tempconut == 0);
+                //Log.d("aaaaaaaaaaaa","aaaaa main room "+temproomid+"  queue T/F "+queue);
                 if(temproomid != 0 && queue == false && tempAppointment != 0){
-                    Log.d("qqqqqqqqq","qqqqqqqq "+tempAppointment+" "+temproomid);
+                    //Log.d("qqqqqqqqq","qqqqqqqq "+tempAppointment+" "+temproomid);
                     BookmarkQueue bookmarkQueue = new BookmarkQueue(patient.getId(),temproomid, tempAppointment);
                     if(tempconut == 0){
                         bookmarkQueue.execute("http://iopd.ml/?function=addQueue");
                         tempconut++;
                     }
                     queueNo = bookmarkQueue.getQueueNo();
-                    Log.d("fffffff","ffffffff "+queue+"    No "+queueNo);
+                    //Log.d("fffffff","ffffffff "+queue+"    No "+queueNo);
                     if(queueNo != 0 && queue == false){
-                        Log.d("ffffffff","fffffffff  "+queueNo);
+                       // Log.d("ffffffff","fffffffff  "+queueNo);
                         home.updateQueue(queueNo);
                         locationManager.removeUpdates(locationListener);
                         locationManager = null;
@@ -296,10 +296,6 @@ public class MainMenuActivity extends AppCompatActivity {
 
     protected static int getRemainQueue(){
         return remainQueue;
-    }
-
-    protected static void changeState(){
-        queue = true;
     }
 
 
