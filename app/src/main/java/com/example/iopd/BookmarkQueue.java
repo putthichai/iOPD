@@ -36,13 +36,16 @@ public class BookmarkQueue extends AsyncTask<String, Void, Void> {
         patientId = pId;
         roomId = rId;
         appointmentId = aId;
-
     }
 
     @Override
     protected Void doInBackground(String... strings) {
         try {
+            Log.d(TAG,"222222222   roomId "+roomId+" appoint "+appointmentId);
 
+            if(roomId == 0 || appointmentId == 0) return null;
+
+            Log.d(TAG,"222222222 pass   roomId "+roomId+" appoint "+appointmentId);
             String data = URLEncoder.encode("patient_id", "UTF-8")
                     + "=" + URLEncoder.encode(String.valueOf(patientId), "UTF-8");
 
@@ -57,6 +60,8 @@ public class BookmarkQueue extends AsyncTask<String, Void, Void> {
 
             data += "&" + URLEncoder.encode("queue_status_id", "UTF-8")
                     + "=" + URLEncoder.encode("1", "UTF-8");
+
+
 
             URL url = new URL(strings[0]);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -80,7 +85,6 @@ public class BookmarkQueue extends AsyncTask<String, Void, Void> {
             while((line = reader.readLine()) != null)
             {
                 // Append server response in string
-                Log.d(TAG,"bbbbbbbb loop"+line);
                 sb.append(line + "\n");
             }
             int tempsbatLast = sb.length();
@@ -90,23 +94,21 @@ public class BookmarkQueue extends AsyncTask<String, Void, Void> {
             reader.close();
             wr.close();
 
-
-            Log.d(ContentValues.TAG,"aaaaaaa qqqqqqqqq string "+temp);
             JSONObject jobj = new JSONObject(temp);
             queueNo = jobj.getInt("queueNo");
-             Log.d(TAG,"aaaaaaa queue jsdon"+jobj.toString());
-
+            Log.d("333333","3333333   "+queueNo);
+            return null;
         }
         catch(Exception ex)
         {
-
+            ex.printStackTrace();
         }
 
         return null;
     }
 
+
     public int getQueueNo(){
-        Log.d(TAG,"qqqqqqwwww  "+queueNo);
         return queueNo;
     }
 }

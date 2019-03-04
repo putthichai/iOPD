@@ -29,18 +29,16 @@ public class MainMenuActivity extends AppCompatActivity {
     private static final String TAG = "";
     private static int queueNo;
     private ViewPager mViewPage;
-    public static String tvLogi, tvLati;
-    private static Double lati1, lati2, logi1, logi2;
     private static boolean queue;
     private static String stateDoing, targetLocation;
-    private static int remainQueue;
+    private static int remainQueue, tempconut;
     private FirebaseInstanceIdService firebaseInstanceIdService;
     private int backButtonCount;
     private int currentPage;
     private TextView right;
     private static Patient patient;
-    private LocationListener locationListener;
-    private LocationManager locationManager;
+    protected static LocationListener locationListener;
+    protected static LocationManager locationManager;
     private static HomeFragment home;
     private NotificationFragment notification;
     private ProcessFragment process;
@@ -51,7 +49,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            Fragment fragment;
+
             switch (item.getItemId()) {
                 case R.id.action_home:
                     setViewPager(0);
@@ -78,6 +76,7 @@ public class MainMenuActivity extends AppCompatActivity {
         queue = false;
         backButtonCount =0;
         currentPage =0;
+        tempconut =0;
 
         //setup page
         mViewPage = findViewById(R.id.fragment);
@@ -111,18 +110,9 @@ public class MainMenuActivity extends AppCompatActivity {
             @Override
             public void onLocationChanged(Location location) {
 
-                Double latitude = location.getLatitude();
-                Double longitude = location.getLongitude();
-                Log.d("aaaaaaa Bookmark","aaaaaaaa "+location.getLatitude()+"     "+location.getLongitude());
-
-                    if(checkInArea(location) == true){
-
-                       // Log.d("zzzz","zzzzz bookmark  "+queueNo);
-
-                        if(queue == false) bookmarkQueue();
-                        //Call function request for notification
-                        //Log.i("Location  aaaaa", location.toString());
-
+                    if(checkInArea(location) == true && queue == false){
+                        Log.d("111111","start bookmark queue "+queue+" queueNo "+queueNo);
+                        bookmarkQueue();
                     }
 
             }
@@ -141,15 +131,8 @@ public class MainMenuActivity extends AppCompatActivity {
             public void onProviderDisabled(String provider) {
 
             }
-
-
-
         };
-
-
         locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 0, 0, locationListener);
-
-
     }
 
 
@@ -242,39 +225,41 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
 
-    protected static void bookmarkQueue()  {
-        Log.i("aaaaaaa Bookmark","aaaaaaa Bookmark");
+    protected static void bookmarkQueue() {
+        int temproomid = 0;
         CallApi getAppointment = new CallApi(patient.getId());
         getAppointment.execute("getAppointmentList");
         int tempAppointment = getAppointment.getAppointmentId();
         int tempEmployee = getAppointment.getEmployeeid();
-       // Log.i("aaaaaaa Bookmark","aaaaaaa Bookmark "+tempAppointment);
         if(tempAppointment == -1){
-
+                return;
         }else {
             if(queue == false && tempEmployee != 0){
-               // Log.d("aaaaaaaaaa main emId","aaaaaaaaaa main emId"+tempEmployee);
                 CallApi getRoomScheduleByPatientId =  new CallApi(tempEmployee);
                 getRoomScheduleByPatientId.execute("getRoomScheduleByEmployeeId");
-                int temproomid = getRoomScheduleByPatientId.getRoomid();
-                Log.d("aaaaaaaaaaaa","aaaaa main room "+temproomid+"  queue T/F "+queue);
-                if(temproomid != 0){
+                temproomid = getRoomScheduleByPatientId.getRoomid();
+                //Log.d("aaaaaaaaaaaa","aaaaa main room "+temproomid+"  queue T/F "+queu  && tempconut == 0);
+                if(temproomid != 0 && queue == false && tempAppointment != 0){
+                    Log.d("qqqqqqqqq","qqqqqqqq "+tempAppointment+" "+temproomid);
                     BookmarkQueue bookmarkQueue = new BookmarkQueue(patient.getId(),temproomid, tempAppointment);
-                    bookmarkQueue.execute("http://iopd.ml/?function=addQueue");
-                   // Log.d("qqqqqq","qqqqqq pId "+patient.getId()+"     roomId "+temproomid+"    Appoint "+tempAppointment);
-                    Log.d("qqqqqqqqqq","qqqqqq return  "+bookmarkQueue.getQueueNo());
+                    if(tempconut == 0){
+                        bookmarkQueue.execute("http://iopd.ml/?function=addQueue");
+                        tempconut++;
+                    }
                     queueNo = bookmarkQueue.getQueueNo();
-                    if(queueNo != 0){
+                    Log.d("fffffff","ffffffff "+queue+"    No "+queueNo);
+                    if(queueNo != 0 && queue == false){
+                        Log.d("ffffffff","fffffffff  "+queueNo);
                         home.updateQueue(queueNo);
-                        Log.d("qqqqqqq","qqqqqqq queueNo "+queueNo);
-                        Log.d(TAG,"aaaaaaa have appointment");
+                        locationManager.removeUpdates(locationListener);
+                        locationManager = null;
                         queue = true;
                     }
-
                 }
 
             }
         }
+
 
     }
 
@@ -282,7 +267,6 @@ public class MainMenuActivity extends AppCompatActivity {
         CallApi inArea = new CallApi(location.getLatitude(),location.getLongitude());
         inArea.execute("CheckInArea");
         Boolean temp = inArea.getInArea();
-        //Log.d("zzzzzz","zzzzzztemp  T/F"+temp);
         return temp;
     }
 
@@ -312,6 +296,10 @@ public class MainMenuActivity extends AppCompatActivity {
 
     protected static int getRemainQueue(){
         return remainQueue;
+    }
+
+    protected static void changeState(){
+        queue = true;
     }
 
 

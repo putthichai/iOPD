@@ -99,9 +99,10 @@ public class CallApi extends AsyncTask<String, Void, String> {
                       if(jobj.getJSONArray("results").getJSONObject(i).get("date").equals(formattedDate)){
                           appointmentid = jobj.getJSONArray("results").getJSONObject(i).getInt("id");
                           employeeid = jobj.getJSONArray("results").getJSONObject(i).getInt("employeeId");
-                         Log.d(TAG,"aaaaaa   app"+appointmentid+"      em"+employeeid);
+                          return  null;
                       }else{
                           appointmentid = -1;
+                          return null;
                       }
                   }
               }
@@ -146,7 +147,7 @@ public class CallApi extends AsyncTask<String, Void, String> {
 
               jobj = new JSONObject(temp);
               roomid = jobj.getInt("roomId");
-
+              return null;
 
           }else if(function == "CheckInArea"){
 
@@ -188,25 +189,14 @@ public class CallApi extends AsyncTask<String, Void, String> {
 
               jobj = new JSONObject(sb.toString());
 
-             // Log.d(TAG,"lllll  "+jobj.getInt("result"));
-
               if(jobj.getInt("result") == 1){
                   inArea = true;
+                  return null;
               }else{
                   inArea = false;
+                  return null;
               }
-
-             // Log.d("llllllll","lllllllll la , lo"+sb.toString());
-
-             // int tempsbatLast = sb.length();
-              //String temp = sb.toString().substring(24,tempsbatLast-2);
-
-              //jobj = new JSONObject(temp);
-              //roomid = jobj.getInt("roomId");
-
-
           }
-
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -215,6 +205,8 @@ public class CallApi extends AsyncTask<String, Void, String> {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+
 
 
        //Log.d(TAG, "doInBackground:aaaaa disconnection2"+ jobj.toString());
