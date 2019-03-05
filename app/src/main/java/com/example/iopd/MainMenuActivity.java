@@ -253,6 +253,9 @@ public class MainMenuActivity extends AppCompatActivity {
                         home.updateQueue(queueNo);
                         locationManager.removeUpdates(locationListener);
                         locationManager = null;
+                        bookmarkQueue = null;
+                        getAppointment = null;
+                        getRoomScheduleByPatientId = null;
                         queue = true;
                     }
                 }

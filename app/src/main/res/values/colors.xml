@@ -11,4 +11,6 @@
     <color name="lineTimelineN">#363636</color>
     <color name="avatar_bg">#DBDEE1</color>
     <color name="background_main">#FFF6DD</color>
+    <color name="login_button">#72FBDB</color>
+    <color name="background_login">#FFFBF0</color>
 </resources>

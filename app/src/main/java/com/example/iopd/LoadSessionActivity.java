@@ -14,11 +14,12 @@ public class LoadSessionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_loadsession);
 
 
-
-
-
-        Intent intent = new Intent(LoadSessionActivity.this,MainMenuActivity.class);
+        Intent intent = new Intent(LoadSessionActivity.this,LoginActivity.class);
         startActivity(intent);
-        finish();
+
+
+       // Intent intent = new Intent(LoadSessionActivity.this,MainMenuActivity.class);
+       // startActivity(intent);
+       // finish();
     }
 }

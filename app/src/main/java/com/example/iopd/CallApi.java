@@ -1,44 +1,32 @@
 package com.example.iopd;
 
-import android.content.ContentValues;
+import android.content.Intent;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
-import static androidx.constraintlayout.widget.Constraints.TAG;
-
-
-public class CallApi extends AsyncTask<String, Void, String> {
+public class CallApi extends AsyncTask<String, Void, Void> {
 
     private URL url = null;
     private String function,list;
     private JSONObject jobj = null;
     private int size;
-    private static int  appointmentid,employeeid,roomid;
+    private static int  appointmentid,employeeid,roomid,statusLogin;
     private int patientid;
     private static double longtitude,latitude;
     private static boolean inArea;
@@ -53,151 +41,135 @@ public class CallApi extends AsyncTask<String, Void, String> {
     }
 
     @Override
-    protected String doInBackground(String... strings) {
+    protected Void doInBackground(String... strings) {
         function = strings[0];
         StringBuffer buffer = new StringBuffer();
         try {
             url = new URL("http://iopd.ml/?function="+function);
-          if(function == "getAppointmentList"){
+            if(function == "getAppointmentList"){
 
-              //Log.d(TAG, "doInBackground:aaaaa start connection");
-              HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-              conn.setRequestMethod("GET");
-              conn.setReadTimeout(10000);
-              conn.setReadTimeout(15000);
-              conn.setDoInput(true);
+                HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setReadTimeout(10000);
+                conn.setReadTimeout(15000);
+                conn.setDoInput(true);
 
-              InputStream in = conn.getInputStream();
-              BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                InputStream in = conn.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                String line = "";
 
-             // Log.d(TAG, "doInBackground:aaaaaa "+reader.toString());
-
-              String line = "";
-              //File file = new File("storage/sdcard/MyIdea/MyCompositions/" + "temp" + ".json");
-              while ((line = reader.readLine()) != null) {
-                  //Log.d("bbbbbb",line);
+                while ((line = reader.readLine()) != null) {
                   buffer.append(line);
-              }
-             // Log.d(TAG, "doInBackground:aaaaaa "+buffer.toString());
-              in.close();
-              reader.close();
-              conn.disconnect();
-              //Log.d(TAG, "doInBackground:aaaaa disconnection");
-              jobj = new JSONObject(buffer.toString());
-              size = jobj.getJSONArray("results").length();
-             // Log.d(TAG, "doInBackground:aaaaa test Json  no"+size);
+                }
+                in.close();
+                reader.close();
+                conn.disconnect();
 
-             for(int i = 0; i < size;  i++){
-                 // Log.d(TAG, "doInBackground:aaaaa test Json"+jobj.getJSONArray("results").getJSONObject(i).getInt("patientId"));
-                  if(jobj.getJSONArray("results").getJSONObject(i).getInt("patientId") == patientid){
-                     // Log.d(TAG,"aaaaaa in case" +i);
+                jobj = new JSONObject(buffer.toString());
+                size = jobj.getJSONArray("results").length();
+                for(int i = 0; i < size;  i++){
 
-                      Date current = Calendar.getInstance().getTime();
-                      SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                      String formattedDate = df.format(current);
-                     //Log.d(TAG,"aaaaaa in cause" +jobj.getJSONArray("results").getJSONObject(i).toString());
-                      if(jobj.getJSONArray("results").getJSONObject(i).get("date").equals(formattedDate)){
+                    if(jobj.getJSONArray("results").getJSONObject(i).getInt("patientId") == patientid){
+                        Date current = Calendar.getInstance().getTime();
+                        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                        String formattedDate = df.format(current);
+                        if(jobj.getJSONArray("results").getJSONObject(i).get("date").equals(formattedDate)){
                           appointmentid = jobj.getJSONArray("results").getJSONObject(i).getInt("id");
                           employeeid = jobj.getJSONArray("results").getJSONObject(i).getInt("employeeId");
                           return  null;
-                      }else{
+                        }else{
                           appointmentid = -1;
                           return null;
-                      }
-                  }
-              }
+                        }
+                    }
+                }
+            }else if(function == "getRoomScheduleByEmployeeId"){
 
-          }else if(function == "getRoomScheduleByEmployeeId"){
-
-             // Log.d(TAG,"aaaaaa Room employee "+patientid);
-
-              String data = URLEncoder.encode("employee_id", "UTF-8")
+                String data = URLEncoder.encode("employee_id", "UTF-8")
                       + "=" + URLEncoder.encode(String.valueOf(patientid), "UTF-8");
 
-              HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-              conn.setRequestMethod("POST");
-              conn.setReadTimeout(10000);
-              conn.setReadTimeout(15000);
-              conn.setUseCaches(false);
-              conn.setDoOutput(true);
-              conn.setDoInput(true);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setReadTimeout(10000);
+                conn.setReadTimeout(15000);
+                conn.setUseCaches(false);
+                conn.setDoOutput(true);
+                conn.setDoInput(true);
 
-              OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-              wr.write( data );
-              wr.flush();
+                OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+                wr.write( data );
+                wr.flush();
 
 
-              BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-              StringBuilder sb = new StringBuilder();
-              String line = null;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line = null;
 
               // Read Server Response
-              while((line = reader.readLine()) != null)
-              {
+                while((line = reader.readLine()) != null) {
                   // Append server response in string
                  // Log.d(TAG,"bbbbbb loop "+line+"\n");
                   sb.append(line + "\n");
-              }
+                }
 
-              conn.disconnect();
-              wr.close();
-              reader.close();
-              int tempsbatLast = sb.length();
-              String temp = sb.toString().substring(24,tempsbatLast-2);
+                conn.disconnect();
+                wr.close();
+                reader.close();
+                int tempsbatLast = sb.length();
+                String temp = sb.toString().substring(24,tempsbatLast-2);
 
-              jobj = new JSONObject(temp);
-              roomid = jobj.getInt("roomId");
-              return null;
-
-          }else if(function == "CheckInArea"){
+                jobj = new JSONObject(temp);
+                roomid = jobj.getInt("roomId");
+                return null;
+            }else if(function == "CheckInArea"){
 
              // Log.d(TAG,"lllllll strat check in area la"+latitude+"   long"+longtitude);
 
-              String data = URLEncoder.encode("latpatient", "UTF-8")
+                String data = URLEncoder.encode("latpatient", "UTF-8")
                       + "=" + URLEncoder.encode(String.valueOf(latitude), "UTF-8");
 
-              data += "&" + URLEncoder.encode("longpatient", "UTF-8") + "="
+                data += "&" + URLEncoder.encode("longpatient", "UTF-8") + "="
                       + URLEncoder.encode(String.valueOf(longtitude), "UTF-8");
 
-              HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-              conn.setRequestMethod("POST");
-              conn.setReadTimeout(10000);
-              conn.setReadTimeout(15000);
-              conn.setUseCaches(false);
-              conn.setDoOutput(true);
-              conn.setDoInput(true);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setReadTimeout(10000);
+                conn.setReadTimeout(15000);
+                conn.setUseCaches(false);
+                conn.setDoOutput(true);
+                conn.setDoInput(true);
 
-              OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-              wr.write( data );
-              wr.flush();
+                OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+                wr.write( data );
+                wr.flush();
 
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line = null;
 
-              BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-              StringBuilder sb = new StringBuilder();
-              String line = null;
+                // Read Server Response
+                while((line = reader.readLine()) != null){
+                  //Append server response in string
+                    sb.append(line + "\n");
+                }
 
-              // Read Server Response
-              while((line = reader.readLine()) != null)
-              {
-                  // Append server response in string
-                  sb.append(line + "\n");
-              }
+                conn.disconnect();
+                wr.close();
+                reader.close();
 
-              conn.disconnect();
-              wr.close();
-              reader.close();
+                jobj = new JSONObject(sb.toString());
 
-              jobj = new JSONObject(sb.toString());
+                if(jobj.getInt("result") == 1){
+                    inArea = true;
+                    return null;
+                }else{
+                    inArea = false;
+                    return null;
+                }
+            }else if(function == "loginPatient"){
 
-              if(jobj.getInt("result") == 1){
-                  inArea = true;
-                  return null;
-              }else{
-                  inArea = false;
-                  return null;
-              }
-          }
-
+                return null;
+            }
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -207,17 +179,18 @@ public class CallApi extends AsyncTask<String, Void, String> {
         }
 
 
-
-
-       //Log.d(TAG, "doInBackground:aaaaa disconnection2"+ jobj.toString());
-
         return null;
     }
 
     @Override
-    protected void onPostExecute(String aVoid) {
+    protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
 
+    }
+
+    @Override
+    protected void onCancelled(Void aVoid) {
+        super.onCancelled(aVoid);
     }
 
     public int getAppointmentId(){
@@ -234,6 +207,11 @@ public class CallApi extends AsyncTask<String, Void, String> {
 
     public boolean getInArea(){
         return inArea;
+    }
+
+    public int getStatusLogin(){
+
+        return statusLogin;
     }
 
 }
