@@ -15,13 +15,14 @@ import android.widget.Toast;
 public class LoginActivity extends AppCompatActivity implements iOPD{
 
     private  EditText usernameView,passwordView;
+    private int countback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-
+        countback = 0;
         usernameView = findViewById(R.id.loginUsername);
         passwordView = findViewById(R.id.loginPassword);
         Button confirmView = findViewById(R.id.confirm);
@@ -95,7 +96,7 @@ public class LoginActivity extends AppCompatActivity implements iOPD{
             focusView = usernameView;
             cancel = true;
         }else if (!isUsernameValid(id)) {
-            usernameView.setError(getString(R.string.error_invalid_email));
+            usernameView.setError(getString(R.string.error_invalid_username));
             focusView = usernameView;
             cancel = true;
         }
@@ -127,5 +128,16 @@ public class LoginActivity extends AppCompatActivity implements iOPD{
             return false;
         }
         return true;
+    }
+
+    public void onBackPressed()
+    {
+        if(countback == 0){
+            Toast.makeText(this, "Press the back button once again to close the application.", Toast.LENGTH_SHORT).show();
+        }
+        if(countback > 1){
+            finish();
+        }
+        countback++;
     }
 }

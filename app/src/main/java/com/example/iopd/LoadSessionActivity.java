@@ -16,6 +16,7 @@ public class LoadSessionActivity extends AppCompatActivity {
 
         Intent intent = new Intent(LoadSessionActivity.this,LoginActivity.class);
         startActivity(intent);
+        finish();
 
 
        // Intent intent = new Intent(LoadSessionActivity.this,MainMenuActivity.class);
