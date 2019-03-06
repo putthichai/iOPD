@@ -17,7 +17,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
-public class RegisterApi extends AsyncTask<String, String, Integer> {
+public class RegisterApi extends AsyncTask<String, String, JSONObject> {
     private String username,password,name,surname,email;
     private Context mContext;
     ProgressDialog mProgress;
@@ -45,8 +45,9 @@ public class RegisterApi extends AsyncTask<String, String, Integer> {
     }
 
     @Override
-    protected Integer doInBackground(String... strings) {
+    protected JSONObject doInBackground(String... strings) {
         Log.d("","111111111  start doInBackground");
+        JSONObject jobj = null;
         int status = 0;
         try {
             String data = null;
@@ -88,10 +89,10 @@ public class RegisterApi extends AsyncTask<String, String, Integer> {
             wr.close();
             reader.close();
 
-            JSONObject jobj = new JSONObject(sb.toString());
+            jobj = new JSONObject(sb.toString());
             status = jobj.getInt("status");
             Log.d("","111111111  end doInBackground");
-            return status;
+            return jobj;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -100,11 +101,11 @@ public class RegisterApi extends AsyncTask<String, String, Integer> {
             e.printStackTrace();
         }
 
-        return status;
+        return jobj;
     }
 
     @Override
-    protected void onPostExecute(Integer integer) {
+    protected void onPostExecute(JSONObject integer) {
         //Log.d("","111111111  onPostExecute "+integer);
         mProgress.dismiss();
         mCallback.processFinish(integer);

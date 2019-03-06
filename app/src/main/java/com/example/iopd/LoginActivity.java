@@ -10,12 +10,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class LoginActivity extends AppCompatActivity implements iOPD{
 
     private  EditText usernameView,passwordView;
-    private int countback;
+    private int countback, pateintId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,28 +64,32 @@ public class LoginActivity extends AppCompatActivity implements iOPD{
 
 
     @Override
-    public void processFinish(Integer output) {
-        if(output == 200){
-            Toast.makeText(this, "Login success", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(LoginActivity.this,MainMenuActivity.class);
-            startActivity(intent);
-            finish();
-        }else {
-            Toast.makeText(this, "wrong username or password", Toast.LENGTH_SHORT).show();
+    public void processFinish(JSONObject output) {
+        try {
+            if(output.getInt("status") == 200){
+                Toast.makeText(this, "Login success", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(LoginActivity.this,MainMenuActivity.class);
+                intent.putExtra("id",output.getJSONObject("results").getInt("user_id"));
+                intent.putExtra("firstname",output.getJSONObject("results").getString("firstname"));
+                intent.putExtra("surname",output.getJSONObject("results").getString("surname"));
+                startActivity(intent);
+                finish();
+            }else {
+                Toast.makeText(this, "wrong username or password", Toast.LENGTH_SHORT).show();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
     }
+
+
 
     public void startLogin(String id, String pw){
         boolean cancel = false;
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(pw) && !isPasswordValid(pw)) {
-            passwordView.setError(getString(R.string.error_incorrect_password));
-            focusView = passwordView;
-            cancel = true;
-        }
         if(TextUtils.isEmpty(pw)){
             passwordView.setError(getString(R.string.error_field_required));
             focusView = passwordView;
@@ -117,14 +123,6 @@ public class LoginActivity extends AppCompatActivity implements iOPD{
     private boolean isUsernameValid(String username) {
         //TODO: Replace this with your own logic
         if(username == ""){
-            return false;
-        }
-        return true;
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        if(password.length() < 4){
             return false;
         }
         return true;

@@ -35,7 +35,7 @@ public class MainMenuActivity extends AppCompatActivity {
     private FirebaseInstanceIdService firebaseInstanceIdService;
     private int backButtonCount;
     private int currentPage;
-    private TextView right;
+    private TextView right ,fullname;
     private static Patient patient;
     protected static LocationListener locationListener;
     protected static LocationManager locationManager;
@@ -70,7 +70,12 @@ public class MainMenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_menu);
 
         //create patient
-        patient = new Patient(2, "test", "test");
+        Intent tempIntent = getIntent();
+        Bundle bundle = tempIntent.getExtras();
+        int tempid = bundle.getInt("id");
+        String tempFN = bundle.getString("firstname");
+        String tempsur = bundle.getString("surname");
+        patient = new Patient(tempid, tempFN, tempsur);
 
         //set area of the hospital
         queue = false;
@@ -86,8 +91,11 @@ public class MainMenuActivity extends AppCompatActivity {
         process = new ProcessFragment();
         place = new PlaceFragment();
 
+        //link with mainmenu
         setupViewPager(mViewPage);
         right = findViewById(R.id.right);
+        fullname = findViewById(R.id.name);
+        fullname.setText(patient.getFullname());
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,12 +19,13 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
 
-public class LoginApi extends AsyncTask<String, String, Integer> {
+public class LoginApi extends AsyncTask<String, String, JSONObject> {
 
    private String username,password;
    private Context mContext;
    ProgressDialog mProgress;
    private iOPD mCallback;
+   private int userId;
 
 
     public LoginApi(Context context,String id, String pw){
@@ -44,8 +46,9 @@ public class LoginApi extends AsyncTask<String, String, Integer> {
     }
 
     @Override
-    protected Integer doInBackground(String... strings) {
+    protected JSONObject doInBackground(String... strings) {
         Log.d("","111111111  start doInBackground");
+        JSONObject jobj = null;
         int statusLogin = 0;
         try {
             String data = null;
@@ -81,10 +84,10 @@ public class LoginApi extends AsyncTask<String, String, Integer> {
             wr.close();
             reader.close();
 
-            JSONObject jobj = new JSONObject(sb.toString());
-            statusLogin = jobj.getInt("status");
+            jobj = new JSONObject(sb.toString());
+
             Log.d("","111111111  end doInBackground");
-            return statusLogin;
+            return jobj;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -93,14 +96,14 @@ public class LoginApi extends AsyncTask<String, String, Integer> {
             e.printStackTrace();
         }
 
-        return statusLogin;
+        return jobj;
     }
 
     @Override
-    protected void onPostExecute(Integer integer) {
+    protected void onPostExecute(JSONObject object) {
         //Log.d("","111111111  onPostExecute "+integer);
         mProgress.dismiss();
-        mCallback.processFinish(integer);
+        mCallback.processFinish(object);
     }
 
 }

@@ -115,11 +115,10 @@ public class CallApi extends AsyncTask<String, Void, Void> {
                 conn.disconnect();
                 wr.close();
                 reader.close();
-                int tempsbatLast = sb.length();
-                String temp = sb.toString().substring(24,tempsbatLast-2);
 
-                jobj = new JSONObject(temp);
-                roomid = jobj.getInt("roomId");
+                jobj = new JSONObject(sb.toString());
+                roomid = jobj.getJSONObject("results").getInt("roomId");
+
                 return null;
             }else if(function == "CheckInArea"){
 

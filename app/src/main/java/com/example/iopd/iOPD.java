@@ -1,9 +1,10 @@
 package com.example.iopd;
 
 
+import org.json.JSONObject;
+
 public interface iOPD {
 
-    public void processFinish(Integer output);
-
+    void processFinish(JSONObject output);
 
 }

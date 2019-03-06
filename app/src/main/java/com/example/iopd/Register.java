@@ -9,6 +9,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Register extends AppCompatActivity implements iOPD{
 
     EditText nameView, sernameView, usernameView, passwordView, emailView;
@@ -135,14 +138,18 @@ public class Register extends AppCompatActivity implements iOPD{
     }
 
     @Override
-    public void processFinish(Integer output) {
-        if(output == 200){
-            Toast.makeText(this, "Register success", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(Register.this,LoginActivity.class);
-            startActivity(intent);
-            finish();
-        }else {
-            Toast.makeText(this, "Username already existed", Toast.LENGTH_SHORT).show();
+    public void processFinish(JSONObject output) {
+        try {
+            if(output.getInt("status") == 200){
+                Toast.makeText(this, "Register success", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(Register.this,LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }else {
+                Toast.makeText(this, "Username already existed", Toast.LENGTH_SHORT).show();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
