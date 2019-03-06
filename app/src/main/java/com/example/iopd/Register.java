@@ -153,6 +153,16 @@ public class Register extends AppCompatActivity implements iOPD{
         }
     }
 
+    @Override
+    public void getIdRoom(int idroom) {
+
+    }
+
+    @Override
+    public void bookmarkFinish(int queueNo) {
+
+    }
+
     public void onBackPressed()
     {
         Intent intent = new Intent(Register.this,LoginActivity.class);

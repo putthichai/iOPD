@@ -7,4 +7,8 @@ public interface iOPD {
 
     void processFinish(JSONObject output);
 
+    void getIdRoom(int idroom);
+
+    void bookmarkFinish(int queueNo);
+
 }

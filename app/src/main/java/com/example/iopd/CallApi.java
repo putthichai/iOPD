@@ -1,7 +1,9 @@
 package com.example.iopd;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,8 +21,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import static androidx.constraintlayout.widget.Constraints.TAG;
 
-public class CallApi extends AsyncTask<String, Void, Void> {
+
+public class CallApi extends AsyncTask<String, Void, JSONObject> {
 
     private URL url = null;
     private String function,list;
@@ -30,9 +34,11 @@ public class CallApi extends AsyncTask<String, Void, Void> {
     private int patientid;
     private static double longtitude,latitude;
     private static boolean inArea;
+    private iOPD mCallback;
 
-    public CallApi(int id){
+    public CallApi(int id, Context context){
         patientid = id;
+        mCallback = (iOPD) context;
     }
 
     public CallApi(double lati,double longti){
@@ -41,47 +47,55 @@ public class CallApi extends AsyncTask<String, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(String... strings) {
+    protected JSONObject doInBackground(String... strings) {
         function = strings[0];
         StringBuffer buffer = new StringBuffer();
         try {
             url = new URL("http://iopd.ml/?function="+function);
-            if(function == "getAppointmentList"){
+            if(function == "getAppointmentByPatientsId"){
 
-                HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-                conn.setRequestMethod("GET");
+                String data = URLEncoder.encode("patient_id", "UTF-8")
+                        + "=" + URLEncoder.encode(String.valueOf(patientid), "UTF-8");
+
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
                 conn.setReadTimeout(10000);
                 conn.setReadTimeout(15000);
+                conn.setUseCaches(false);
+                conn.setDoOutput(true);
                 conn.setDoInput(true);
 
-                InputStream in = conn.getInputStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                String line = "";
+                OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+                wr.write( data );
+                wr.flush();
 
-                while ((line = reader.readLine()) != null) {
-                  buffer.append(line);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+
+                // Read Server Response
+                while((line = reader.readLine()) != null) {
+                    // Append server response in string
+                    // Log.d(TAG,"bbbbbb loop "+line+"\n");
+                    sb.append(line + "\n");
                 }
-                in.close();
-                reader.close();
+
                 conn.disconnect();
+                wr.close();
+                reader.close();
 
-                jobj = new JSONObject(buffer.toString());
-                size = jobj.getJSONArray("results").length();
-                for(int i = 0; i < size;  i++){
-
-                    if(jobj.getJSONArray("results").getJSONObject(i).getInt("patientId") == patientid){
-                        Date current = Calendar.getInstance().getTime();
-                        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                        String formattedDate = df.format(current);
-                        if(jobj.getJSONArray("results").getJSONObject(i).get("date").equals(formattedDate)){
-                          appointmentid = jobj.getJSONArray("results").getJSONObject(i).getInt("id");
-                          employeeid = jobj.getJSONArray("results").getJSONObject(i).getInt("employeeId");
-                          return  null;
-                        }else{
-                          appointmentid = -1;
-                          return null;
-                        }
-                    }
+                jobj = new JSONObject(sb.toString());
+                Date current = Calendar.getInstance().getTime();
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                String formattedDate = df.format(current);
+                if(jobj.getJSONObject("results").getString("date").equals(formattedDate)){
+                    appointmentid = jobj.getJSONObject("results").getInt("id");
+                    employeeid = jobj.getJSONObject("results").getInt("employeeId");
+                    Log.d(TAG,"asasas  "+appointmentid+"    "+employeeid);
+                    return  jobj;
+                }else{
+                    appointmentid = -1;
+                    return jobj;
                 }
             }else if(function == "getRoomScheduleByEmployeeId"){
 
@@ -99,7 +113,6 @@ public class CallApi extends AsyncTask<String, Void, Void> {
                 OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
                 wr.write( data );
                 wr.flush();
-
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 StringBuilder sb = new StringBuilder();
@@ -119,7 +132,7 @@ public class CallApi extends AsyncTask<String, Void, Void> {
                 jobj = new JSONObject(sb.toString());
                 roomid = jobj.getJSONObject("results").getInt("roomId");
 
-                return null;
+                return jobj;
             }else if(function == "CheckInArea"){
 
              // Log.d(TAG,"lllllll strat check in area la"+latitude+"   long"+longtitude);
@@ -157,17 +170,13 @@ public class CallApi extends AsyncTask<String, Void, Void> {
                 reader.close();
 
                 jobj = new JSONObject(sb.toString());
-
                 if(jobj.getInt("result") == 1){
                     inArea = true;
-                    return null;
                 }else{
                     inArea = false;
-                    return null;
                 }
-            }else if(function == "loginPatient"){
 
-                return null;
+                return jobj;
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -182,15 +191,17 @@ public class CallApi extends AsyncTask<String, Void, Void> {
     }
 
     @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
+    protected void onPostExecute(JSONObject object) {
+       if(function == "getRoomScheduleByEmployeeId"){
+           try {
+               mCallback.getIdRoom(object.getJSONObject("results").getInt("roomId"));
+           } catch (JSONException e) {
+               e.printStackTrace();
+           }
+       }
 
     }
 
-    @Override
-    protected void onCancelled(Void aVoid) {
-        super.onCancelled(aVoid);
-    }
 
     public int getAppointmentId(){
         return appointmentid;
@@ -206,11 +217,6 @@ public class CallApi extends AsyncTask<String, Void, Void> {
 
     public boolean getInArea(){
         return inArea;
-    }
-
-    public int getStatusLogin(){
-
-        return statusLogin;
     }
 
 }

@@ -22,9 +22,11 @@ import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
-public class MainMenuActivity extends AppCompatActivity {
+public class MainMenuActivity extends AppCompatActivity implements iOPD{
 
     private static final String TAG = "";
     private static int queueNo;
@@ -97,6 +99,8 @@ public class MainMenuActivity extends AppCompatActivity {
         fullname = findViewById(R.id.name);
         fullname.setText(patient.getFullname());
 
+        new AppointmentApi(MainMenuActivity.this,patient.getId()).execute("http://iopd.ml/?function=getAppointmentByPatientsId");
+
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         firebaseInstanceIdService = new FirebaseInstanceIdService();
@@ -116,9 +120,9 @@ public class MainMenuActivity extends AppCompatActivity {
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-
+                Log.d("00000000000","start bookmark queue "+queue+" queueNo "+queueNo+"   "+checkInArea(location));
                     if(checkInArea(location) == true && queue == false){
-                        //Log.d("111111","start bookmark queue "+queue+" queueNo "+queueNo);
+                        Log.d("00000000000","start bookmark queue "+queue+" queueNo "+queueNo);
                         bookmarkQueue();
                     }
 
@@ -232,45 +236,11 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
 
-    protected static void bookmarkQueue(){
+    protected void bookmarkQueue(){
        // Log.d("bbbbbbbb","bbbbbbb start bookmark");
-        int temproomid;
-        CallApi getAppointment = new CallApi(patient.getId());
-        getAppointment.execute("getAppointmentList");
-        int tempAppointment = getAppointment.getAppointmentId();
-        int tempEmployee = getAppointment.getEmployeeid();
-        if(tempAppointment == -1){
-                return;
-        }else {
-            if(queue == false && tempEmployee != 0){
-                CallApi getRoomScheduleByPatientId =  new CallApi(tempEmployee);
-                getRoomScheduleByPatientId.execute("getRoomScheduleByEmployeeId");
-                temproomid = getRoomScheduleByPatientId.getRoomid();
-                //Log.d("aaaaaaaaaaaa","aaaaa main room "+temproomid+"  queue T/F "+queue);
-                if(temproomid != 0 && queue == false && tempAppointment != 0){
-                    //Log.d("qqqqqqqqq","qqqqqqqq "+tempAppointment+" "+temproomid);
-                    BookmarkQueue bookmarkQueue = new BookmarkQueue(patient.getId(),temproomid, tempAppointment);
-                    if(tempconut == 0){
-                        bookmarkQueue.execute("http://iopd.ml/?function=addQueue");
-                        tempconut++;
-                    }
-                    queueNo = bookmarkQueue.getQueueNo();
-                    //Log.d("fffffff","ffffffff "+queue+"    No "+queueNo);
-                    if(queueNo != 0 && queue == false){
-                       // Log.d("ffffffff","fffffffff  "+queueNo);
-                        home.updateQueue(queueNo);
-                        locationManager.removeUpdates(locationListener);
-                        locationManager = null;
-                        bookmarkQueue = null;
-                        getAppointment = null;
-                        getRoomScheduleByPatientId = null;
-                        queue = true;
-                    }
-                }
-
-            }
+        if(patient.haveAppointment()){
+            new CallApi(patient.getDoctor(),MainMenuActivity.this).execute("getRoomScheduleByEmployeeId");
         }
-
 
     }
 
@@ -309,5 +279,40 @@ public class MainMenuActivity extends AppCompatActivity {
         return remainQueue;
     }
 
+    protected static Patient getPatient(){
+        return patient;
+    }
 
+
+    @Override
+    public void processFinish(JSONObject output) {
+
+        try {
+            String[] tempDate = output.getJSONObject("results").getString("date").split("-");
+            String date = tempDate[2]+"-"+tempDate[1]+"-"+tempDate[0];
+            Log.d("dddddddddddd","dddddddddd   "+date);
+            patient.setAppointmentDate(date);
+            patient.setAppointment(output.getJSONObject("results").getInt("employeeId"),output.getJSONObject("results").getInt("id"));
+            home.setAppointment(date);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void getIdRoom(int idRoom) {
+        if(tempconut == 0){
+            new BookmarkQueue(patient.getId(),idRoom,patient.getAppointmentId(),MainMenuActivity.this).execute("http://iopd.ml/?function=addQueue");
+            tempconut++;
+        }
+
+    }
+
+    @Override
+    public void bookmarkFinish(int queueNo) {
+        this.queueNo = queueNo;
+        home.updateQueue(queueNo);
+        queue = true;
+    }
 }

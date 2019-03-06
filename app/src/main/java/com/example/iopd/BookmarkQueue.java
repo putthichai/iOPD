@@ -8,6 +8,7 @@ import android.util.Log;
 
 import junit.framework.Assert;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedOutputStream;
@@ -26,20 +27,22 @@ import java.util.Calendar;
 
 import static android.content.ContentValues.TAG;
 
-public class BookmarkQueue extends AsyncTask<String, Void, Void> {
+public class BookmarkQueue extends AsyncTask<String, Void, JSONObject> {
 
     private static  int patientId, roomId, appointmentId;
 
     private static int queueNo;
+    private iOPD mCallback;
 
-    public BookmarkQueue(int pId, int rId, int aId){
+    public BookmarkQueue(int pId, int rId, int aId, Context context){
         patientId = pId;
         roomId = rId;
         appointmentId = aId;
+        mCallback = (iOPD) context;
     }
 
     @Override
-    protected Void doInBackground(String... strings) {
+    protected JSONObject doInBackground(String... strings) {
         try {
             //Log.d(TAG,"222222222   roomId "+roomId+" appoint "+appointmentId);
 
@@ -87,17 +90,15 @@ public class BookmarkQueue extends AsyncTask<String, Void, Void> {
                 // Append server response in string
                 sb.append(line + "\n");
             }
-            int tempsbatLast = sb.length();
-            String temp = sb.toString().substring(24,tempsbatLast-2);
 
             conn.disconnect();
             reader.close();
             wr.close();
 
-            JSONObject jobj = new JSONObject(temp);
-            queueNo = jobj.getInt("queueNo");
+            JSONObject jobj = new JSONObject(sb.toString());
+            //queueNo = jobj.getInt("queueNo");
            // Log.d("333333","3333333   "+queueNo);
-            return null;
+            return jobj;
         }
         catch(Exception ex)
         {
@@ -107,9 +108,13 @@ public class BookmarkQueue extends AsyncTask<String, Void, Void> {
         return null;
     }
 
-
-    public int getQueueNo(){
-        return queueNo;
+    @Override
+    protected void onPostExecute(JSONObject object) {
+        try {
+            mCallback.bookmarkFinish(object.getJSONObject("results").getInt("queueNo"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }
 

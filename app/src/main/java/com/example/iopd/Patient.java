@@ -1,5 +1,7 @@
 package com.example.iopd;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Patient {
@@ -8,12 +10,14 @@ public class Patient {
     private String name, surname;
     private int state;
     private int queueNo;
-    private Date appointment;
+    private String appointment;
+    private int doctor, appointmentId;
 
     public Patient(int mId, String mName, String mSurname){
         id = mId;
         name = mName;
         surname = mSurname;
+        appointment = "";
     }
 
     public int getId(){
@@ -32,7 +36,7 @@ public class Patient {
         return name+" "+surname;
     }
 
-    public Date getAppointment(){
+    public String getAppointment(){
         return appointment;
     }
 
@@ -40,7 +44,30 @@ public class Patient {
         state = now;
     }
 
-    public void setAppointment(Date date){
+    public void setAppointmentDate(String date){
         appointment = date;
+    }
+
+    public boolean haveAppointment(){
+        Date current = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+        String formattedDate = df.format(current);
+        if(appointment.equals(formattedDate)){
+            return true;
+        }
+        return false;
+    }
+
+    public void setAppointment(int doc,int ap){
+        doctor = doc;
+        appointmentId = ap;
+    }
+
+    public int getDoctor(){
+        return doctor;
+    }
+
+    public int getAppointmentId(){
+        return appointmentId;
     }
 }

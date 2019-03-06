@@ -79,10 +79,20 @@ public class LoginActivity extends AppCompatActivity implements iOPD{
             }
         } catch (JSONException e) {
             e.printStackTrace();
+
         }
 
     }
 
+    @Override
+    public void getIdRoom(int idroom) {
+
+    }
+
+    @Override
+    public void bookmarkFinish(int queueNo) {
+
+    }
 
 
     public void startLogin(String id, String pw){

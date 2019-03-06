@@ -15,7 +15,7 @@ import android.widget.Toast;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment{
     private static final String TAG = "";
     protected TextView queue;
     protected TextView date;
@@ -73,7 +73,7 @@ public class HomeFragment extends Fragment {
     }
 
 
-    public void changeState(String state, String place, int remain){
+    protected void changeState(String state, String place, int remain){
 
         Log.d("pppppp","PPPP state "+state+" place "+place+" remain "+remain);
         if(state == null){
@@ -89,6 +89,10 @@ public class HomeFragment extends Fragment {
 
     protected void updateQueue(int tempInt){
         queue.setText(String.valueOf(tempInt));
+    }
+
+    protected void setAppointment(String tempDate){
+        date.setText(tempDate);
     }
 
     @Override
