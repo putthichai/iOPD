@@ -33,21 +33,20 @@ public class LoginActivity extends AppCompatActivity implements iOPD{
         Button registerView = findViewById(R.id.register);
         Button resetView = findViewById(R.id.reset);
 
-        if(haveNetwork()){
+
             confirmView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     String id,pw;
-
                     id = usernameView.getText().toString();
-                    pw = passwordView.getText().toString();
-
+                    pw = passwordView.getText().toString();if(haveNetwork()){
                     startLogin(id,pw);
+                }else if(!haveNetwork()){
+                    Toast.makeText(LoginActivity.this,"Network connection is not avalilable",Toast.LENGTH_SHORT).show();
+                }
                 }
             });
-        }else if(!haveNetwork()){
-            Toast.makeText(this,"Network connection is not avalilable",Toast.LENGTH_SHORT).show();
-        }
+
 
 
         registerView.setOnClickListener(new View.OnClickListener() {
