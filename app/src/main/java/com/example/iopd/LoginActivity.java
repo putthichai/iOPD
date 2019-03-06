@@ -1,6 +1,8 @@
 package com.example.iopd;
 
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -31,17 +33,22 @@ public class LoginActivity extends AppCompatActivity implements iOPD{
         Button registerView = findViewById(R.id.register);
         Button resetView = findViewById(R.id.reset);
 
-        confirmView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String id,pw;
+        if(haveNetwork()){
+            confirmView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String id,pw;
 
-                id = usernameView.getText().toString();
-                pw = passwordView.getText().toString();
+                    id = usernameView.getText().toString();
+                    pw = passwordView.getText().toString();
 
-                startLogin(id,pw);
-            }
-        });
+                    startLogin(id,pw);
+                }
+            });
+        }else if(!haveNetwork()){
+            Toast.makeText(this,"Network connection is not avalilable",Toast.LENGTH_SHORT).show();
+        }
+
 
         registerView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,5 +173,26 @@ public class LoginActivity extends AppCompatActivity implements iOPD{
             finish();
         }
         countback++;
+    }
+
+    private boolean haveNetwork(){
+        boolean have_WIFI = false;
+        boolean have_MOBILEDATA = false;
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo[] networkInfos = connectivityManager.getAllNetworkInfo();
+
+        for(NetworkInfo info:networkInfos){
+            if(info.getTypeName().equalsIgnoreCase("WIFI"));
+                if(info.isConnected())
+                    have_WIFI = true;
+
+            if(info.getTypeName().equalsIgnoreCase("MOBILE"));
+                if(info.isConnected())
+                    have_MOBILEDATA = true;
+
+        }
+
+        return have_MOBILEDATA || have_WIFI;
     }
 }
