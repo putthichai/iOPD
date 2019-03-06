@@ -11,4 +11,6 @@ public interface iOPD {
 
     void bookmarkFinish(int queueNo);
 
+    void checkIn(Boolean statue);
+
 }

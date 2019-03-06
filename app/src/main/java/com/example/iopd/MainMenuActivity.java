@@ -35,7 +35,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
     private static String stateDoing, targetLocation;
     private static int remainQueue, tempconut;
     private FirebaseInstanceIdService firebaseInstanceIdService;
-    private int backButtonCount;
+    private int backButtonCount,countLocation;
     private int currentPage;
     private TextView right ,fullname;
     private static Patient patient;
@@ -84,6 +84,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
         backButtonCount =0;
         currentPage =0;
         tempconut =0;
+        countLocation =0;
 
         //setup page
         mViewPage = findViewById(R.id.fragment);
@@ -120,11 +121,11 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                Log.d("00000000000","start bookmark queue "+queue+" queueNo "+queueNo+"   "+checkInArea(location));
-                    if(checkInArea(location) == true && queue == false){
-                        Log.d("00000000000","start bookmark queue "+queue+" queueNo "+queueNo);
-                        bookmarkQueue();
-                    }
+                if(countLocation == 0){
+                    new CallApi(location.getLatitude(),location.getLongitude(),MainMenuActivity.this).execute("CheckInArea");
+                    countLocation++;
+                }
+
 
             }
 
@@ -244,14 +245,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
 
     }
 
-    public static boolean checkInArea(Location location){
-        CallApi inArea = new CallApi(location.getLatitude(),location.getLongitude());
-        inArea.execute("CheckInArea");
-        Boolean temp = inArea.getInArea();
-        return temp;
-    }
-
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -314,5 +307,18 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
         this.queueNo = queueNo;
         home.updateQueue(queueNo);
         queue = true;
+        locationManager.removeUpdates(locationListener);
+        locationManager = null;
+    }
+
+    @Override
+    public void checkIn(Boolean statue) {
+        if(statue){
+            bookmarkQueue();
+        }else {
+            countLocation = 0;
+            locationManager.removeUpdates(locationListener);
+            locationManager = null;
+        }
     }
 }

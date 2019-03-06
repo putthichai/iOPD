@@ -41,9 +41,10 @@ public class CallApi extends AsyncTask<String, Void, JSONObject> {
         mCallback = (iOPD) context;
     }
 
-    public CallApi(double lati,double longti){
+    public CallApi(double lati,double longti, Context context){
         latitude = lati;
         longtitude = longti;
+        mCallback = (iOPD) context;
     }
 
     @Override
@@ -197,7 +198,21 @@ public class CallApi extends AsyncTask<String, Void, JSONObject> {
                mCallback.getIdRoom(object.getJSONObject("results").getInt("roomId"));
            } catch (JSONException e) {
                e.printStackTrace();
+           }finally {
+               mCallback.getIdRoom(0);
            }
+       }else if(function == "CheckInArea"){
+           Boolean temp = false;
+           try {
+               if(object.getInt("result") == 1){
+                   temp = true;
+               }
+           } catch (JSONException e) {
+               e.printStackTrace();
+           }finally {
+               mCallback.checkIn(temp);
+           }
+
        }
 
     }

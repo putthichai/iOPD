@@ -65,21 +65,29 @@ public class LoginActivity extends AppCompatActivity implements iOPD{
 
     @Override
     public void processFinish(JSONObject output) {
+        int tempStatus = 0,tempId = 0;
+        String tempFirst = "", tempSur = "";
         try {
-            if(output.getInt("status") == 200){
-                Toast.makeText(this, "Login success", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(LoginActivity.this,MainMenuActivity.class);
-                intent.putExtra("id",output.getJSONObject("results").getInt("user_id"));
-                intent.putExtra("firstname",output.getJSONObject("results").getString("firstname"));
-                intent.putExtra("surname",output.getJSONObject("results").getString("surname"));
-                startActivity(intent);
-                finish();
-            }else {
-                Toast.makeText(this, "wrong username or password", Toast.LENGTH_SHORT).show();
-            }
+            tempStatus = output.getInt("status");
+            tempId = output.getJSONObject("results").getInt("user_id");
+            tempFirst = output.getJSONObject("results").getString("firstname");
+            tempSur = output.getJSONObject("results").getString("surname");
+
         } catch (JSONException e) {
             e.printStackTrace();
 
+        }
+
+        if(tempStatus == 200){
+            Toast.makeText(this, "Login success", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(LoginActivity.this,MainMenuActivity.class);
+            intent.putExtra("id",tempId);
+            intent.putExtra("firstname",tempFirst);
+            intent.putExtra("surname",tempSur);
+            startActivity(intent);
+            finish();
+        }else {
+            Toast.makeText(this, "wrong username or password", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -91,6 +99,11 @@ public class LoginActivity extends AppCompatActivity implements iOPD{
 
     @Override
     public void bookmarkFinish(int queueNo) {
+
+    }
+
+    @Override
+    public void checkIn(Boolean statue) {
 
     }
 

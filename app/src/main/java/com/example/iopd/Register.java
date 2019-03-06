@@ -163,6 +163,11 @@ public class Register extends AppCompatActivity implements iOPD{
 
     }
 
+    @Override
+    public void checkIn(Boolean statue) {
+
+    }
+
     public void onBackPressed()
     {
         Intent intent = new Intent(Register.this,LoginActivity.class);
