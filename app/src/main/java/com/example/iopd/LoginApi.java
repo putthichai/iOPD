@@ -90,13 +90,15 @@ public class LoginApi extends AsyncTask<String, String, JSONObject> {
             return jobj;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+            return null;
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         } catch (JSONException e) {
             e.printStackTrace();
+            return null;
         }
 
-        return jobj;
     }
 
     @Override

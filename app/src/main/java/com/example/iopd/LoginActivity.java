@@ -67,28 +67,34 @@ public class LoginActivity extends AppCompatActivity implements iOPD{
     public void processFinish(JSONObject output) {
         int tempStatus = 0,tempId = 0;
         String tempFirst = "", tempSur = "";
-        try {
-            tempStatus = output.getInt("status");
-            tempId = output.getJSONObject("results").getInt("user_id");
-            tempFirst = output.getJSONObject("results").getString("firstname");
-            tempSur = output.getJSONObject("results").getString("surname");
 
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if(!output.equals(null)){
+            try {
+                tempStatus = output.getInt("status");
+                tempId = output.getJSONObject("results").getInt("user_id");
+                tempFirst = output.getJSONObject("results").getString("firstname");
+                tempSur = output.getJSONObject("results").getString("surname");
 
-        }
+            } catch (JSONException e) {
+                e.printStackTrace();
 
-        if(tempStatus == 200){
-            Toast.makeText(this, "Login success", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(LoginActivity.this,MainMenuActivity.class);
-            intent.putExtra("id",tempId);
-            intent.putExtra("firstname",tempFirst);
-            intent.putExtra("surname",tempSur);
-            startActivity(intent);
-            finish();
+            }
+
+            if(tempStatus == 200){
+                Toast.makeText(this, "Login success", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(LoginActivity.this,MainMenuActivity.class);
+                intent.putExtra("id",tempId);
+                intent.putExtra("firstname",tempFirst);
+                intent.putExtra("surname",tempSur);
+                startActivity(intent);
+                finish();
+            }else {
+                Toast.makeText(this, "wrong username or password", Toast.LENGTH_SHORT).show();
+            }
         }else {
-            Toast.makeText(this, "wrong username or password", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "check internet", Toast.LENGTH_SHORT).show();
         }
+
 
     }
 
