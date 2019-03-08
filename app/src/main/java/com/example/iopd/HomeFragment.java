@@ -50,10 +50,13 @@ public class HomeFragment extends Fragment{
         doing = root.findViewById(R.id.proDoing);
         date = root.findViewById(R.id.apDate);
         process = root.findViewById(R.id.processLayer);
-
-
-        //queue.setText(MainMenuActivity.getQueueNo());
-
+        View settingCV = root.findViewById(R.id.settingCV);
+       settingCV.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               ((MainMenuActivity)getActivity()).setViewPager(5);
+           }
+       });
 
         suggestion.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,6 +72,7 @@ public class HomeFragment extends Fragment{
                 ((MainMenuActivity)getActivity()).setViewPager(3);
             }
         });
+
         return root;
     }
 

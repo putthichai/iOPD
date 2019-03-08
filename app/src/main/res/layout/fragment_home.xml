@@ -233,7 +233,7 @@
                 android:layout_height="match_parent">
 
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/setting"
+                    android:id="@+id/settingCV"
                     android:layout_width="90dp"
                     android:layout_height="80dp"
                     android:layout_marginStart="8dp"
@@ -246,7 +246,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <ImageView
-                        android:id="@+id/imageView4"
+                        android:id="@+id/settingText"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:scaleType="fitXY"
