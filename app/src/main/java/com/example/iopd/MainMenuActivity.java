@@ -146,7 +146,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
 
             }
         };
-        locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 1, 0, locationListener);
+        locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 3000, 0, locationListener);
     }
 
 
