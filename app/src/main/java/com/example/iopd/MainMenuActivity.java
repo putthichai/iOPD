@@ -8,6 +8,8 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -128,14 +130,13 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+                Toast.makeText(getApplicationContext(),"La "+location.getLatitude()+" long "+location.getLongitude(),Toast.LENGTH_SHORT).show();
                 Log.d("cccccccccccccccc","bbbbbbb in onLocationChanged function");
                 if(countLocation == 0){
                     Log.d("cccccccccccccccc","bbbbbbb start to check in area");
                     new CallApi(location.getLatitude(),location.getLongitude(),MainMenuActivity.this).execute("CheckInArea");
                     countLocation++;
                 }
-
-
             }
 
             @Override
@@ -154,6 +155,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
             }
         };
         locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 5000, 0, locationListener);
+        locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER, 5000, 0, locationListener);
     }
 
 
@@ -326,14 +328,37 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
 
     @Override
     public void checkIn(Boolean statue) {
-        if(statue){
+        Toast.makeText(getApplicationContext(),"Network connection is not avalilable "+haveNetwork()+"   "+statue,Toast.LENGTH_SHORT).show();
+        if(statue && haveNetwork()){
             Log.d("cccccccccccccccc","bbbbbbb In area");
             bookmarkQueue();
-        }else {
+        }else{
             Log.d("cccccccccccccccc","bbbbbbb not In area");
+            Toast.makeText(getApplicationContext(),"Network connection is not avalilable",Toast.LENGTH_SHORT).show();
             countLocation = 0;
             //locationManager.removeUpdates(locationListener);
             //locationManager = null;
         }
+    }
+
+    private boolean haveNetwork(){
+        boolean have_WIFI = false;
+        boolean have_MOBILEDATA = false;
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo[] networkInfos = connectivityManager.getAllNetworkInfo();
+
+        for(NetworkInfo info:networkInfos){
+            if(info.getTypeName().equalsIgnoreCase("WIFI"));
+            if(info.isConnected())
+                have_WIFI = true;
+
+            if(info.getTypeName().equalsIgnoreCase("MOBILE"));
+            if(info.isConnected())
+                have_MOBILEDATA = true;
+
+        }
+
+        return have_MOBILEDATA || have_WIFI;
     }
 }
