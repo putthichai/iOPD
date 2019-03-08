@@ -20,12 +20,14 @@ public class LoginActivity extends AppCompatActivity implements iOPD{
 
     private  EditText usernameView,passwordView;
     private int countback, pateintId;
+    SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        sessionManager = new SessionManager(this);
         countback = 0;
         usernameView = findViewById(R.id.loginUsername);
         passwordView = findViewById(R.id.loginPassword);
@@ -88,10 +90,8 @@ public class LoginActivity extends AppCompatActivity implements iOPD{
 
             if(tempStatus == 200){
                 Toast.makeText(this, "Login success", Toast.LENGTH_SHORT).show();
+                sessionManager.createLoginSession(tempFirst,tempSur,String.valueOf(tempId));
                 Intent intent = new Intent(LoginActivity.this,MainMenuActivity.class);
-                intent.putExtra("id",tempId);
-                intent.putExtra("firstname",tempFirst);
-                intent.putExtra("surname",tempSur);
                 startActivity(intent);
                 finish();
             }else {

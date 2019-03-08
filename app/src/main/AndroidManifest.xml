@@ -26,18 +26,15 @@
         <activity android:name=".LoginActivity" />
         <activity
             android:name=".MainMenuActivity"
-            android:label="@string/title_activity_main_menu"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".LoadSessionActivity"
-            android:label="iOPD">
+            android:label="iOPD"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity android:name=".LoadSessionActivity"/>
         <service android:name=".FirebaseInstanceIdService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />

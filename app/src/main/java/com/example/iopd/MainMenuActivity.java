@@ -27,6 +27,8 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+
 
 public class MainMenuActivity extends AppCompatActivity implements iOPD{
 
@@ -47,6 +49,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
     private NotificationFragment notification;
     private ProcessFragment process;
     private PlaceFragment place;
+    SessionManager sessionManager;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -73,6 +76,9 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main_menu);
 
+        sessionManager = new SessionManager(this);
+        sessionManager.checkLogin();
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -86,11 +92,17 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
         }
 
         //create patient
-        Intent tempIntent = getIntent();
-        Bundle bundle = tempIntent.getExtras();
-        int tempid = bundle.getInt("id");
-        String tempFN = bundle.getString("firstname");
-        String tempsur = bundle.getString("surname");
+        //Intent tempIntent = getIntent();
+        //Bundle bundle = tempIntent.getExtras();
+        HashMap<String, String> user = sessionManager.getUserDetail();
+
+        int tempid = Integer.valueOf(user.get(sessionManager.ID));
+        String tempFN = user.get(sessionManager.NAME);
+        String tempsur = user.get(sessionManager.SURNAME);
+
+        //int tempid = bundle.getInt("id");
+        //String tempFN = bundle.getString("firstname");
+        //String tempsur = bundle.getString("surname");
         patient = new Patient(tempid, tempFN, tempsur);
 
         //set area of the hospital
@@ -130,7 +142,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                Toast.makeText(getApplicationContext(),"La "+location.getLatitude()+" long "+location.getLongitude(),Toast.LENGTH_SHORT).show();
                 Log.d("cccccccccccccccc","bbbbbbb in onLocationChanged function");
                 if(countLocation == 0){
                     Log.d("cccccccccccccccc","bbbbbbb start to check in area");
