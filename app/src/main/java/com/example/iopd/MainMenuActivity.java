@@ -98,6 +98,11 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
         tempconut =0;
         countLocation =0;
 
+        //
+        stateDoing = "";
+        targetLocation = "";
+        remainQueue = 0;
+
         //setup page
         mViewPage = findViewById(R.id.fragment);
 
@@ -123,7 +128,9 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+                Log.d("cccccccccccccccc","bbbbbbb in onLocationChanged function");
                 if(countLocation == 0){
+                    Log.d("cccccccccccccccc","bbbbbbb start to check in area");
                     new CallApi(location.getLatitude(),location.getLongitude(),MainMenuActivity.this).execute("CheckInArea");
                     countLocation++;
                 }
@@ -146,7 +153,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
 
             }
         };
-        locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 1, 0, locationListener);
+        locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 5000, 0, locationListener);
     }
 
 
@@ -240,8 +247,10 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
     }
 
     protected void bookmarkQueue(){
-       // Log.d("bbbbbbbb","bbbbbbb start bookmark");
+       Log.d("cccccccccccccccc","bbbbbbb start in function bookmarkQueue");
         if(patient.haveAppointment()){
+            Log.d("cccccccccccccccc","bbbbbbb pass condition in function bookmarkQueue");
+            Log.d("cccccccccccccccc","bbbbbbb have Appointment start to find roomId ");
             new CallApi(patient.getDoctor(),MainMenuActivity.this).execute("getRoomScheduleByEmployeeId");
         }
 
@@ -253,7 +262,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
 
         if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
             if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-                locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 0, 0, locationListener);
+                locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 5000, 0, locationListener);
             }
         }
     }
@@ -298,6 +307,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
     @Override
     public void getIdRoom(int idRoom) {
         if(tempconut == 0){
+            Log.d("cccccccccccccccc","bbbbbbb start to add queue function");
             new BookmarkQueue(patient.getId(),idRoom,patient.getAppointmentId(),MainMenuActivity.this).execute("http://iopd.ml/?function=addQueue");
             tempconut++;
         }
@@ -306,6 +316,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
 
     @Override
     public void bookmarkFinish(int queueNo) {
+        Log.d("cccccccccccccccc","bbbbbbb end to bookmark");
         this.queueNo = queueNo;
         home.updateQueue(queueNo);
         queue = true;
@@ -316,11 +327,13 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
     @Override
     public void checkIn(Boolean statue) {
         if(statue){
+            Log.d("cccccccccccccccc","bbbbbbb In area");
             bookmarkQueue();
         }else {
+            Log.d("cccccccccccccccc","bbbbbbb not In area");
             countLocation = 0;
-            locationManager.removeUpdates(locationListener);
-            locationManager = null;
+            //locationManager.removeUpdates(locationListener);
+            //locationManager = null;
         }
     }
 }

@@ -193,6 +193,7 @@ public class CallApi extends AsyncTask<String, Void, JSONObject> {
 
     @Override
     protected void onPostExecute(JSONObject object) {
+        Log.d("cccccccccccccccc","bbbbbbb End CallApi function "+function);
        if(function == "getRoomScheduleByEmployeeId"){
            try {
                mCallback.getIdRoom(object.getJSONObject("results").getInt("roomId"));
