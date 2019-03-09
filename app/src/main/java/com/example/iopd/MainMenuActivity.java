@@ -50,6 +50,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
     private ProcessFragment process;
     private PlaceFragment place;
     SessionManager sessionManager;
+    QueueSession queueSession;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -77,96 +78,108 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
         setContentView(R.layout.activity_main_menu);
 
         sessionManager = new SessionManager(this);
+        queueSession = new QueueSession(this);
         sessionManager.checkLogin();
+        if(sessionManager.isLoggin()){
+            Log.d("ssssssssssssssss",""+queueSession.isQueueNo());
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
-            return;
+            if(queueSession.isQueueNo()){
+            queueNo = queueSession.getQueueDetail();
+            }else {
+                queueNo = 0;
+            }
+
+
+            //create patient
+            //Intent tempIntent = getIntent();
+            //Bundle bundle = tempIntent.getExtras();
+            HashMap<String, String> user = sessionManager.getUserDetail();
+
+            int tempid = Integer.valueOf(user.get(sessionManager.ID));
+            String tempFN = user.get(sessionManager.NAME);
+            String tempsur = user.get(sessionManager.SURNAME);
+
+            //int tempid = bundle.getInt("id");
+            //String tempFN = bundle.getString("firstname");
+            //String tempsur = bundle.getString("surname");
+            patient = new Patient(tempid, tempFN, tempsur);
+
+            //set area of the hospital
+            queue = false;
+            backButtonCount =0;
+            currentPage =0;
+            tempconut =0;
+            countLocation =0;
+
+            //
+            stateDoing = "";
+            targetLocation = "";
+            remainQueue = 0;
+
+            //setup page
+            mViewPage = findViewById(R.id.fragment);
+
+            home = new HomeFragment();
+            notification = new NotificationFragment();
+            process = new ProcessFragment();
+            place = new PlaceFragment();
+
+            //link with mainmenu
+            setupViewPager(mViewPage);
+            right = findViewById(R.id.right);
+            fullname = findViewById(R.id.name);
+            fullname.setText(patient.getFullname());
+
+            new AppointmentApi(MainMenuActivity.this,patient.getId()).execute("http://iopd.ml/?function=getAppointmentByPatientsId");
+
+            BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+            bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+            firebaseInstanceIdService = new FirebaseInstanceIdService();
+
+
+            locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+            locationListener = new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    //Log.d("cccccccccccccccc","bbbbbbb in onLocationChanged function");
+                    if(countLocation == 0 && queueNo == 0){
+                        //Log.d("cccccccccccccccc","bbbbbbb start to check in area");
+                        new CallApi(location.getLatitude(),location.getLongitude(),MainMenuActivity.this).execute("CheckInArea");
+                        countLocation++;
+                    }
+                }
+
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+
+                }
+
+                @Override
+                public void onProviderEnabled(String provider) {
+
+                }
+
+                @Override
+                public void onProviderDisabled(String provider) {
+
+                }
+            };
+
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+                return;
+            }
+            locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 5000, 0, locationListener);
+            locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER, 5000, 0, locationListener);
         }
 
-        //create patient
-        //Intent tempIntent = getIntent();
-        //Bundle bundle = tempIntent.getExtras();
-        HashMap<String, String> user = sessionManager.getUserDetail();
-
-        int tempid = Integer.valueOf(user.get(sessionManager.ID));
-        String tempFN = user.get(sessionManager.NAME);
-        String tempsur = user.get(sessionManager.SURNAME);
-
-        //int tempid = bundle.getInt("id");
-        //String tempFN = bundle.getString("firstname");
-        //String tempsur = bundle.getString("surname");
-        patient = new Patient(tempid, tempFN, tempsur);
-
-        //set area of the hospital
-        queue = false;
-        backButtonCount =0;
-        currentPage =0;
-        tempconut =0;
-        countLocation =0;
-
-        //
-        stateDoing = "";
-        targetLocation = "";
-        remainQueue = 0;
-
-        //setup page
-        mViewPage = findViewById(R.id.fragment);
-
-        home = new HomeFragment();
-        notification = new NotificationFragment();
-        process = new ProcessFragment();
-        place = new PlaceFragment();
-
-        //link with mainmenu
-        setupViewPager(mViewPage);
-        right = findViewById(R.id.right);
-        fullname = findViewById(R.id.name);
-        fullname.setText(patient.getFullname());
-
-        new AppointmentApi(MainMenuActivity.this,patient.getId()).execute("http://iopd.ml/?function=getAppointmentByPatientsId");
-
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        firebaseInstanceIdService = new FirebaseInstanceIdService();
-
-
-        locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                //Log.d("cccccccccccccccc","bbbbbbb in onLocationChanged function");
-                if(countLocation == 0){
-                    //Log.d("cccccccccccccccc","bbbbbbb start to check in area");
-                    new CallApi(location.getLatitude(),location.getLongitude(),MainMenuActivity.this).execute("CheckInArea");
-                    countLocation++;
-                }
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        };
-        locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 5000, 0, locationListener);
-        locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER, 5000, 0, locationListener);
     }
 
 
@@ -344,10 +357,11 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
     public void bookmarkFinish(int queueNo) {
         //Log.d("cccccccccccccccc","bbbbbbb end to bookmark");
         this.queueNo = queueNo;
+        queueSession.createSession(queueNo);
         home.updateQueue(queueNo);
         queue = true;
-        locationManager.removeUpdates(locationListener);
-        locationManager = null;
+        //locationManager.removeUpdates(locationListener);
+        //locationManager = null;
     }
 
     @Override
@@ -387,9 +401,9 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
     }
 
     public void logout(){
-        sessionManager.checkLogin();
-        Intent intent = new Intent(MainMenuActivity.this,LoginActivity.class);
-        startActivity(intent);
-        finish();
+        //queueSession.clearSession();
+        queueSession.clearSession();
+        sessionManager.logout();
+
     }
 }

@@ -3,6 +3,7 @@ package com.example.iopd;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import java.util.HashMap;
 
@@ -41,7 +42,7 @@ public class SessionManager {
     }
 
     public void checkLogin(){
-
+        Log.d("sssssssssss",""+isLoggin());
         if (!this.isLoggin()){
             Intent i = new Intent(context, LoginActivity.class);
             context.startActivity(i);
