@@ -52,7 +52,7 @@ public class CallApi extends AsyncTask<String, Void, JSONObject> {
         function = strings[0];
         StringBuffer buffer = new StringBuffer();
         try {
-            url = new URL("http://iopd.ml/?function="+function);
+            url = new URL("https://iopdapi.ml/?function="+function);
             if(function == "getAppointmentByPatientsId"){
 
                 String data = URLEncoder.encode("patient_id", "UTF-8")

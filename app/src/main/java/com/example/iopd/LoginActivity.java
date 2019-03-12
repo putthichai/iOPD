@@ -150,7 +150,7 @@ public class LoginActivity extends AppCompatActivity implements iOPD{
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             //Log.d("aaaaa","aaaaaa user "+id+"  pass "+pw);
-            new LoginApi(LoginActivity.this,id,pw).execute("http://iopd.ml/?function=loginPatient");
+            new LoginApi(LoginActivity.this,id,pw).execute("https://iopdapi.ml/?function=loginPatient");
         }
 
     }

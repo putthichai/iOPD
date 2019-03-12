@@ -130,7 +130,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
             fullname = findViewById(R.id.name);
             fullname.setText(patient.getFullname());
 
-            new AppointmentApi(MainMenuActivity.this,patient.getId()).execute("http://iopd.ml/?function=getAppointmentByPatientsId");
+            new AppointmentApi(MainMenuActivity.this,patient.getId()).execute("https://iopdapi.ml/?function=getAppointmentByPatientsId");
 
             BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
             bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -333,7 +333,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
         try {
             String[] tempDate = output.getJSONObject("results").getString("date").split("-");
             String date = tempDate[2]+"-"+tempDate[1]+"-"+tempDate[0];
-            //Log.d("dddddddddddd","dddddddddd   "+date);
+            Log.d("dddddddddddd","dddddddddd   "+date);
             patient.setAppointmentDate(date);
             patient.setAppointment(output.getJSONObject("results").getInt("employeeId"),output.getJSONObject("results").getInt("id"));
             home.setAppointment(date);
@@ -347,7 +347,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
     public void getIdRoom(int idRoom) {
         if(tempconut == 0){
             //Log.d("cccccccccccccccc","bbbbbbb start to add queue function");
-            new BookmarkQueue(patient.getId(),idRoom,patient.getAppointmentId(),MainMenuActivity.this).execute("http://iopd.ml/?function=addQueue");
+            new BookmarkQueue(patient.getId(),idRoom,patient.getAppointmentId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=addQueue");
             tempconut++;
         }
 

@@ -2,6 +2,7 @@ package com.example.iopd;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,6 +35,8 @@ public class AppointmentApi extends AsyncTask<String, Integer, JSONObject> {
             String data = URLEncoder.encode("patient_id", "UTF-8")
                     + "=" + URLEncoder.encode(String.valueOf(patientid), "UTF-8");
 
+            Log.d("aaaaaaaaaa","connection to api");
+
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setReadTimeout(10000);
@@ -54,14 +57,16 @@ public class AppointmentApi extends AsyncTask<String, Integer, JSONObject> {
             // Read Server Response
             while((line = reader.readLine()) != null) {
                 // Append server response in string
+
                 sb.append(line + "\n");
             }
 
             conn.disconnect();
             wr.close();
             reader.close();
-
+            Log.d("aaaaaaaaaaaaa ","aasss"+sb.toString());
             JSONObject jobj = new JSONObject(sb.toString());
+            Log.d("aaaaaaaaaaaaa ","aasss"+jobj.toString());
             return  jobj;
         } catch (MalformedURLException e) {
             e.printStackTrace();

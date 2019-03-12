@@ -83,7 +83,7 @@ public class LoginApi extends AsyncTask<String, String, JSONObject> {
             conn.disconnect();
             wr.close();
             reader.close();
-
+            Log.d("","111111111  "+sb.toString());
             jobj = new JSONObject(sb.toString());
 
             Log.d("","111111111  end doInBackground");
