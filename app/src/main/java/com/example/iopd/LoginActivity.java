@@ -89,16 +89,18 @@ public class LoginActivity extends AppCompatActivity implements iOPD{
             }
 
             if(tempStatus == 200){
-                Toast.makeText(this, "Login success", Toast.LENGTH_SHORT).show();
                 sessionManager.createLoginSession(tempFirst,tempSur,String.valueOf(tempId));
                 Intent intent = new Intent(LoginActivity.this,MainMenuActivity.class);
                 startActivity(intent);
                 finish();
+                Toast.makeText(this, "Login success", Toast.LENGTH_SHORT).show();
             }else {
-                Toast.makeText(this, "wrong username or password", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "username or password is wrong", Toast.LENGTH_SHORT).show();
+                passwordView.setText("");
             }
         }else {
                 Toast.makeText(this, "check internet", Toast.LENGTH_SHORT).show();
+                passwordView.setText("");
         }
 
 

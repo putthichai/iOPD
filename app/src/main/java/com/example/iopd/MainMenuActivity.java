@@ -193,59 +193,40 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
     //change page
     public void setViewPager(int page){
         if(page == 0){
-            mViewPage.removeAllViews();
+            //mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(home,"Home");
-            home.onStart();
-            place.onStop();
-            notification.onStop();
-            process.onStop();
             currentPage = 0;
             mViewPage.setAdapter(adapter);
+            home.setAppointment(patient.getAppointment());
         }else if(page == 1){
-            mViewPage.removeAllViews();
+            //mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(place,"Suggestion location");
-            home.onStop();
-            place.onStart();
-            notification.onStop();
-            process.onStop();
             mViewPage.setAdapter(adapter);
             currentPage = 1;
         }else if(page == 2){
-            mViewPage.removeAllViews();
+            //mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(notification,"Notification");
-            home.onDestroy();
-            place.onStop();
-            notification.onStart();
-            process.onStop();
             mViewPage.setAdapter(adapter);
             currentPage =2;
         }else if(page == 3){
-            mViewPage.removeAllViews();
+            //mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(process,"Progress");
-            home.onStop();
-            place.onStop();
-            notification.onStop();
-            process.onStart();
             mViewPage.setAdapter(adapter);
             currentPage = 3;
         }else if(page == 4){
-            mViewPage.removeAllViews();
+            //mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(new Place2Fragment(),"Progress");
             mViewPage.setAdapter(adapter);
             currentPage = 4;
         }else if(page == 5){
-            mViewPage.removeAllViews();
+            //mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(new SettingFragment(),"Setting");
-            home.onStop();
-            place.onStop();
-            notification.onStop();
-            process.onStop();
             mViewPage.setAdapter(adapter);
             currentPage = 5;
         }
@@ -286,10 +267,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
     }
 
     protected void bookmarkQueue(){
-       //Log.d("cccccccccccccccc","bbbbbbb start in function bookmarkQueue");
         if(patient.haveAppointment()){
-            //Log.d("cccccccccccccccc","bbbbbbb pass condition in function bookmarkQueue");
-            //Log.d("cccccccccccccccc","bbbbbbb have Appointment start to find roomId ");
             new CallApi(patient.getDoctor(),MainMenuActivity.this).execute("getRoomScheduleByEmployeeId");
         }
 
@@ -333,10 +311,10 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
         try {
             String[] tempDate = output.getJSONObject("results").getString("date").split("-");
             String date = tempDate[2]+"-"+tempDate[1]+"-"+tempDate[0];
-            Log.d("dddddddddddd","dddddddddd   "+date);
             patient.setAppointmentDate(date);
             patient.setAppointment(output.getJSONObject("results").getInt("employeeId"),output.getJSONObject("results").getInt("id"));
             home.setAppointment(date);
+            right.setText(output.getString("process"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -346,7 +324,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
     @Override
     public void getIdRoom(int idRoom) {
         if(tempconut == 0){
-            //Log.d("cccccccccccccccc","bbbbbbb start to add queue function");
             new BookmarkQueue(patient.getId(),idRoom,patient.getAppointmentId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=addQueue");
             tempconut++;
         }
@@ -370,12 +347,15 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
         if(statue && haveNetwork()){
             //Log.d("cccccccccccccccc","bbbbbbb In area");
             bookmarkQueue();
-        }else{
+        }else if(!haveNetwork()){
             //Log.d("cccccccccccccccc","bbbbbbb not In area");
             Toast.makeText(getApplicationContext(),"Network connection is not avalilable",Toast.LENGTH_SHORT).show();
             countLocation = 0;
             //locationManager.removeUpdates(locationListener);
             //locationManager = null;
+        }else if(!statue){
+            Toast.makeText(getApplicationContext(),"Out of reach",Toast.LENGTH_SHORT).show();
+            countLocation = 0;
         }
     }
 
@@ -402,6 +382,8 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
 
     public void logout(){
         //queueSession.clearSession();
+        locationManager.removeUpdates(locationListener);
+        locationManager = null;
         queueSession.clearSession();
         sessionManager.logout();
 
