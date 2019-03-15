@@ -230,7 +230,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
             mViewPage.setAdapter(adapter);
             currentPage = 5;
         }
-    }
+    }//kuy
 
 
     //set value back bottom
