@@ -2,6 +2,7 @@ package com.example.iopd;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -17,6 +18,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
@@ -199,6 +201,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
             currentPage = 0;
             mViewPage.setAdapter(adapter);
             home.setAppointment(patient.getAppointment());
+            home.setTime(patient.getTimeStart(),patient.getTimeEnd());
         }else if(page == 1){
             //mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
@@ -314,6 +317,8 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
             patient.setAppointmentDate(date);
             patient.setAppointment(output.getJSONObject("results").getInt("employeeId"),output.getJSONObject("results").getInt("id"));
             home.setAppointment(date);
+            patient.setTime(output.getJSONObject("results").getString("timeslot_starttime"),output.getJSONObject("results").getString("timeslot_endtime"));
+            home.setTime(patient.getTimeStart(),patient.getTimeEnd());
             right.setText(output.getString("process"));
         } catch (JSONException e) {
             e.printStackTrace();
@@ -322,9 +327,24 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
     }
 
     @Override
-    public void getIdRoom(int idRoom) {
+    public void getIdRoom(final int idRoom) {
         if(tempconut == 0){
-            new BookmarkQueue(patient.getId(),idRoom,patient.getAppointmentId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=addQueue");
+            AlertDialog.Builder builder =
+                    new AlertDialog.Builder(MainMenuActivity.this);
+            builder.setMessage("คุณต้องการจองคิวมั้ยคะ?");
+            builder.setPositiveButton("ตกลง", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    new BookmarkQueue(patient.getId(),idRoom,patient.getAppointmentId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=addQueue");
+                    Toast.makeText(getApplicationContext(), "คุณได้ทำการจองคิวแล้วคะ", Toast.LENGTH_SHORT).show();
+                }
+            });
+            builder.setNegativeButton("ยกเลิก", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //dialog.dismiss();
+                }
+            });
+            builder.show();
             tempconut++;
         }
 

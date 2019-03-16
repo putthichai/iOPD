@@ -19,7 +19,7 @@ public class HomeFragment extends Fragment{
     private static final String TAG = "";
     protected TextView queue;
     protected TextView date;
-    protected TextView time;
+    protected TextView timeStart,timeEnd;
     protected TextView doing;
     protected TextView where;
     protected TextView when;
@@ -46,7 +46,8 @@ public class HomeFragment extends Fragment{
         name = root.findViewById(R.id.name);
         right = root.findViewById(R.id.right);
         suggestion = root.findViewById(R.id.suggestion);
-        time = root.findViewById(R.id.apTime);
+        timeStart = root.findViewById(R.id.apTimeStart);
+        timeEnd = root.findViewById(R.id.apTimeEnd);
         doing = root.findViewById(R.id.proDoing);
         date = root.findViewById(R.id.apDate);
         process = root.findViewById(R.id.processLayer);
@@ -97,6 +98,11 @@ public class HomeFragment extends Fragment{
 
     protected void setAppointment(String tempDate){
         date.setText(tempDate);
+    }
+
+    protected void setTime(String start,String end){
+        timeStart.setText(start);
+        timeEnd.setText(end);
     }
 
     @Override

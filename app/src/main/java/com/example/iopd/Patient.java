@@ -10,7 +10,7 @@ public class Patient {
     private String name, surname;
     private int state;
     private int queueNo;
-    private String appointment;
+    private String appointment,timeStart,timeEnd;
     private int doctor, appointmentId;
 
     public Patient(int mId, String mName, String mSurname){
@@ -18,6 +18,8 @@ public class Patient {
         name = mName;
         surname = mSurname;
         appointment = "";
+        timeStart = "";
+        timeEnd = "";
     }
 
     public int getId(){
@@ -61,6 +63,19 @@ public class Patient {
     public void setAppointment(int doc,int ap){
         doctor = doc;
         appointmentId = ap;
+    }
+
+    public void setTime(String s, String e){
+        timeStart = s;
+        timeEnd = e;
+    }
+
+    public String getTimeStart(){
+        return timeStart;
+    }
+
+    public String getTimeEnd(){
+        return timeEnd;
     }
 
     public int getDoctor(){
