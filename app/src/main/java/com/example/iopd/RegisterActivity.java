@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -170,6 +171,11 @@ public class RegisterActivity extends AppCompatActivity implements iOPD{
 
     @Override
     public void loadProcess(JSONObject object) {
+
+    }
+
+    @Override
+    public void loadAllprocess(JSONArray jsonArray) {
 
     }
 

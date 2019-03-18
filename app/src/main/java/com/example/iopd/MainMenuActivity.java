@@ -26,9 +26,11 @@ import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -184,10 +186,11 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
             currentPage =2;
         }else if(page == 3){
             //mViewPage.removeAllViews();
+            currentPage = 3;
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(process,"Progress");
             mViewPage.setAdapter(adapter);
-            currentPage = 3;
+            callAllProcess();
         }else if(page == 4){
             //mViewPage.removeAllViews();
             //SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
@@ -367,6 +370,28 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
         }
     }
 
+    @Override
+    public void loadAllprocess(JSONArray jsonArray) {
+        Log.d("222222222222","load value all process");
+
+        if(jsonArray != null){
+            String[] name = new String[jsonArray.length()];
+            int[] id = new int[jsonArray.length()];
+            try {
+                for(int i=0; i<jsonArray.length();i++){
+                    JSONObject temp = jsonArray.getJSONObject(i);
+                    name[i] = temp.getString("name");
+                    id[i] =(temp.getInt("queueTypeId"));
+                }
+                process.setProcess(name,id);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //process.setProcess();
+    }
+
     private boolean haveNetwork(){
         boolean have_WIFI = false;
         boolean have_MOBILEDATA = false;
@@ -453,5 +478,10 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
     public void turnOffGPS(){
         locationManager.removeUpdates(locationListener);
         locationManager = null;
+    }
+
+    public void callAllProcess(){
+        Log.d("2222222222","callAllProcesses");
+        new AllProcessesApi(patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=getAllProcesses");
     }
 }

@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.github.vipulasri.timelineview.TimelineView;
@@ -15,6 +17,10 @@ import com.github.vipulasri.timelineview.TimelineView;
  * A simple {@link Fragment} subclass.
  */
 public class ProcessFragment extends Fragment {
+
+    private ListView listView;
+    private  View root;
+    private CustomAdapter adapter;
 
 
     public ProcessFragment() {
@@ -26,9 +32,20 @@ public class ProcessFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_process, container, false);
+        root = inflater.inflate(R.layout.fragment_process, container, false);
+        listView = root.findViewById(R.id.processList);
+
 
         return root;
+    }
+
+    protected void setProcess(String[] process,int[] order){
+        adapter = new CustomAdapter(root.getContext(), process, order);
+        listView.setAdapter(adapter);
+    }
+
+    protected void passProcess(int step){
+        adapter.passProcess(step);
     }
 
 }

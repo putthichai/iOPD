@@ -1,6 +1,7 @@
 package com.example.iopd;
 
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public interface iOPD {
@@ -14,5 +15,7 @@ public interface iOPD {
     void checkIn(Boolean statue);
 
     void loadProcess(JSONObject object);
+
+    void loadAllprocess(JSONArray jsonArray);
 
 }
