@@ -13,4 +13,6 @@ public interface iOPD {
 
     void checkIn(Boolean statue);
 
+    void loadProcess(JSONObject object);
+
 }

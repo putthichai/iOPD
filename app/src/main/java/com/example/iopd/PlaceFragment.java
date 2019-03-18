@@ -20,6 +20,7 @@ import android.widget.TextView;
 public class PlaceFragment extends Fragment {
 
     private GridView mgridView;
+    private TextView remainQueue;
 
 
     public PlaceFragment() {
@@ -34,6 +35,8 @@ public class PlaceFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_place, container, false);
         mgridView = root.findViewById(R.id.placeGrid);
         mgridView.setAdapter(new GridAdapter(getActivity()));
+        remainQueue = root.findViewById(R.id.waitTime);
+
 
         mgridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -42,6 +45,13 @@ public class PlaceFragment extends Fragment {
             }
         });
         return root;
+    }
+
+    protected void setRemainQueue(int no){
+        if(no != 0){
+            remainQueue.setText(String.valueOf(no));
+        }
+
     }
 
 }

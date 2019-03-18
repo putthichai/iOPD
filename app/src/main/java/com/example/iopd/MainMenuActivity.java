@@ -51,6 +51,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
     private NotificationFragment notification;
     private ProcessFragment process;
     private PlaceFragment place;
+    private SettingFragment settingFragment;
     SessionManager sessionManager;
     QueueSession queueSession;
 
@@ -125,6 +126,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
             notification = new NotificationFragment();
             process = new ProcessFragment();
             place = new PlaceFragment();
+            settingFragment = new SettingFragment();
 
             //link with mainmenu
             setupViewPager(mViewPage);
@@ -138,48 +140,12 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
             bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
             firebaseInstanceIdService = new FirebaseInstanceIdService();
 
+            turnOnGPS();
 
-            locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
-            locationListener = new LocationListener() {
-                @Override
-                public void onLocationChanged(Location location) {
-                    //Log.d("cccccccccccccccc","bbbbbbb in onLocationChanged function");
-                    if(countLocation == 0 && queueNo == 0){
-                        //Log.d("cccccccccccccccc","bbbbbbb start to check in area");
-                        new CallApi(location.getLatitude(),location.getLongitude(),MainMenuActivity.this).execute("CheckInArea");
-                        countLocation++;
-                    }
-                }
+        }
 
-                @Override
-                public void onStatusChanged(String provider, int status, Bundle extras) {
-
-                }
-
-                @Override
-                public void onProviderEnabled(String provider) {
-
-                }
-
-                @Override
-                public void onProviderDisabled(String provider) {
-
-                }
-            };
-
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
-                return;
-            }
-            locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 5000, 0, locationListener);
-            locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER, 5000, 0, locationListener);
+        if(queueNo != 0){
+            checkProcess();
         }
 
     }
@@ -202,12 +168,14 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
             mViewPage.setAdapter(adapter);
             home.setAppointment(patient.getAppointment());
             home.setTime(patient.getTimeStart(),patient.getTimeEnd());
+            checkProcess();
         }else if(page == 1){
             //mViewPage.removeAllViews();
+            currentPage = 1;
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(place,"Suggestion location");
             mViewPage.setAdapter(adapter);
-            currentPage = 1;
+            checkProcess();
         }else if(page == 2){
             //mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
@@ -222,18 +190,18 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
             currentPage = 3;
         }else if(page == 4){
             //mViewPage.removeAllViews();
-            SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
-            adapter.addFragment(new Place2Fragment(),"Progress");
-            mViewPage.setAdapter(adapter);
-            currentPage = 4;
+            //SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
+            //adapter.addFragment(new Place2Fragment(),"Progress");
+            //mViewPage.setAdapter(adapter);
+            //currentPage = 4;
         }else if(page == 5){
             //mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
-            adapter.addFragment(new SettingFragment(),"Setting");
+            adapter.addFragment(settingFragment,"Setting");
             mViewPage.setAdapter(adapter);
             currentPage = 5;
         }
-    }//kuy
+    }
 
 
     //set value back bottom
@@ -319,6 +287,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
             home.setAppointment(date);
             patient.setTime(output.getJSONObject("results").getString("timeslot_starttime"),output.getJSONObject("results").getString("timeslot_endtime"));
             home.setTime(patient.getTimeStart(),patient.getTimeEnd());
+            patient.setWorkflowId(output.getJSONObject("results").getInt("workflowId"));
             right.setText(output.getString("process"));
         } catch (JSONException e) {
             e.printStackTrace();
@@ -334,7 +303,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
             builder.setMessage("คุณต้องการจองคิวมั้ยคะ?");
             builder.setPositiveButton("ตกลง", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    new BookmarkQueue(patient.getId(),idRoom,patient.getAppointmentId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=addQueue");
+                    new BookmarkQueue(patient.getId(),idRoom,patient.getAppointmentId(),patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=addQueue");
                     Toast.makeText(getApplicationContext(), "คุณได้ทำการจองคิวแล้วคะ", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -357,8 +326,8 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
         queueSession.createSession(queueNo);
         home.updateQueue(queueNo);
         queue = true;
-        //locationManager.removeUpdates(locationListener);
-        //locationManager = null;
+        checkProcess();
+
     }
 
     @Override
@@ -376,6 +345,25 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
         }else if(!statue){
             Toast.makeText(getApplicationContext(),"Out of reach",Toast.LENGTH_SHORT).show();
             countLocation = 0;
+        }
+    }
+
+    @Override
+    public void loadProcess(JSONObject object) {
+        try {
+            if(object != null){
+                Log.d("vvvvvvvvvvvvvvvv","loadProcess");
+                if(currentPage == 0){
+                    home.changeState(object.getString("step"),object.getString("targetPlace"),object.getInt("remainQueue"));
+                }
+                else {
+                    place.setRemainQueue(object.getInt("remainQueue"));
+                }
+
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
@@ -407,5 +395,63 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
         queueSession.clearSession();
         sessionManager.logout();
 
+    }
+
+    public void checkProcess(){
+        new ProcessApi(queueNo,MainMenuActivity.this).execute("https://iopdapi.ml/?function=getStep");
+    }
+
+    public void turnOnGPS(){
+
+        locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                //Log.d("cccccccccccccccc","bbbbbbb in onLocationChanged function");
+                if(countLocation == 0 && queueNo == 0){
+                    //Log.d("cccccccccccccccc","bbbbbbb start to check in area");
+                    new CallApi(location.getLatitude(),location.getLongitude(),MainMenuActivity.this).execute("CheckInArea");
+                    countLocation++;
+                }
+                if(queueNo != 0){
+                    //checkProcess();
+                }
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+            return;
+        }
+        locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 5000, 0, locationListener);
+        locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER, 5000, 0, locationListener);
+
+    }
+
+    public void turnOffGPS(){
+        locationManager.removeUpdates(locationListener);
+        locationManager = null;
     }
 }

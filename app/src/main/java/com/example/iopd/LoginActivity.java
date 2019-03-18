@@ -54,7 +54,7 @@ public class LoginActivity extends AppCompatActivity implements iOPD{
         registerView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this,Register.class);
+                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -118,6 +118,11 @@ public class LoginActivity extends AppCompatActivity implements iOPD{
 
     @Override
     public void checkIn(Boolean statue) {
+
+    }
+
+    @Override
+    public void loadProcess(JSONObject object) {
 
     }
 

@@ -11,7 +11,7 @@ public class Patient {
     private int state;
     private int queueNo;
     private String appointment,timeStart,timeEnd;
-    private int doctor, appointmentId;
+    private int doctor, appointmentId,workflowId;
 
     public Patient(int mId, String mName, String mSurname){
         id = mId;
@@ -68,6 +68,14 @@ public class Patient {
     public void setTime(String s, String e){
         timeStart = s;
         timeEnd = e;
+    }
+
+    public void setWorkflowId(int id){
+        workflowId = id;
+    }
+
+    public int getWorkflowId(){
+        return workflowId;
     }
 
     public String getTimeStart(){

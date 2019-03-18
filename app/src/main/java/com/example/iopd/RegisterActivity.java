@@ -12,7 +12,7 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Register extends AppCompatActivity implements iOPD{
+public class RegisterActivity extends AppCompatActivity implements iOPD{
 
     EditText nameView, sernameView, usernameView, passwordView, emailView;
 
@@ -33,7 +33,7 @@ public class Register extends AppCompatActivity implements iOPD{
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Register.this,LoginActivity.class);
+                Intent intent = new Intent(RegisterActivity.this,LoginActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -115,7 +115,7 @@ public class Register extends AppCompatActivity implements iOPD{
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             //Log.d("aaaaa","aaaaaa user "+id+"  pass "+pw);
-            new RegisterApi(Register.this,name,surname,id,pw,email).execute("https://iopdapi.ml/?function=registerPatient");
+            new RegisterApi(RegisterActivity.this,name,surname,id,pw,email).execute("https://iopdapi.ml/?function=registerPatient");
         }
     }
 
@@ -141,8 +141,8 @@ public class Register extends AppCompatActivity implements iOPD{
     public void processFinish(JSONObject output) {
         try {
             if(output.getInt("status") == 200){
-                Toast.makeText(this, "Register success", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(Register.this,LoginActivity.class);
+                Toast.makeText(this, "RegisterActivity success", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(RegisterActivity.this,LoginActivity.class);
                 startActivity(intent);
                 finish();
             }else {
@@ -168,9 +168,14 @@ public class Register extends AppCompatActivity implements iOPD{
 
     }
 
+    @Override
+    public void loadProcess(JSONObject object) {
+
+    }
+
     public void onBackPressed()
     {
-        Intent intent = new Intent(Register.this,LoginActivity.class);
+        Intent intent = new Intent(RegisterActivity.this,LoginActivity.class);
         startActivity(intent);
         finish();
     }

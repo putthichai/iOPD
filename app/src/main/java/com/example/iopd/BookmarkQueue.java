@@ -29,15 +29,16 @@ import static android.content.ContentValues.TAG;
 
 public class BookmarkQueue extends AsyncTask<String, Void, JSONObject> {
 
-    private static  int patientId, roomId, appointmentId;
+    private static  int patientId, roomId, appointmentId,workflowId;
 
     private static int queueNo;
     private iOPD mCallback;
 
-    public BookmarkQueue(int pId, int rId, int aId, Context context){
+    public BookmarkQueue(int pId, int rId, int aId,int wId, Context context){
         patientId = pId;
         roomId = rId;
         appointmentId = aId;
+        workflowId = wId;
         mCallback = (iOPD) context;
     }
 
@@ -63,6 +64,9 @@ public class BookmarkQueue extends AsyncTask<String, Void, JSONObject> {
 
             data += "&" + URLEncoder.encode("queue_status_id", "UTF-8")
                     + "=" + URLEncoder.encode("1", "UTF-8");
+
+            data += "&" + URLEncoder.encode("workflowId", "UTF-8")
+                    + "=" + URLEncoder.encode(String.valueOf(workflowId), "UTF-8");
 
 
 
