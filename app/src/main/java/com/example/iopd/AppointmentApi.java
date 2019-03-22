@@ -23,19 +23,11 @@ public class AppointmentApi extends AsyncTask<String, Integer, JSONObject> {
 
     private int patientid;
     private iOPD mCallback;
-    ProgressDialog mProgress;
-    private Context mContext;
 
 
     public AppointmentApi(Context context,int id){
         patientid = id;
         mCallback = (iOPD) context;
-        mContext = context;
-    }
-
-    protected void onPreExecute() {
-        mProgress = new ProgressDialog(mContext);
-        mProgress.show();
     }
 
     @Override
@@ -146,8 +138,6 @@ public class AppointmentApi extends AsyncTask<String, Integer, JSONObject> {
 
     @Override
     protected void onPostExecute(JSONObject object) {
-        mProgress.dismiss();
         mCallback.processFinish(object);
-
     }
 }

@@ -17,7 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-public class LoginActivity extends AppCompatActivity implements iOPD{
+public class LoginActivity extends AppCompatActivity implements iOPD2{
 
     private  EditText usernameView,passwordView;
     private int countback, pateintId;
@@ -77,7 +77,7 @@ public class LoginActivity extends AppCompatActivity implements iOPD{
         int tempStatus = 0,tempId = 0;
         String tempFirst = "", tempSur = "";
 
-        if(!output.equals(null)){
+        if(output != null){
             try {
                 tempStatus = output.getInt("status");
                 tempId = output.getJSONObject("results").getInt("user_id");
@@ -106,32 +106,6 @@ public class LoginActivity extends AppCompatActivity implements iOPD{
 
 
     }
-
-    @Override
-    public void getIdRoom(int idroom) {
-
-    }
-
-    @Override
-    public void bookmarkFinish(int queueNo) {
-
-    }
-
-    @Override
-    public void checkIn(Boolean statue) {
-
-    }
-
-    @Override
-    public void loadProcess(JSONObject object) {
-
-    }
-
-    @Override
-    public void loadAllprocess(JSONArray jsonArray) {
-
-    }
-
 
     public void startLogin(String id, String pw){
         boolean cancel = false;

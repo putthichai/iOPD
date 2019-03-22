@@ -13,7 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class RegisterActivity extends AppCompatActivity implements iOPD{
+public class RegisterActivity extends AppCompatActivity implements iOPD2{
 
     EditText nameView, sernameView, usernameView, passwordView, emailView;
 
@@ -152,31 +152,6 @@ public class RegisterActivity extends AppCompatActivity implements iOPD{
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void getIdRoom(int idroom) {
-
-    }
-
-    @Override
-    public void bookmarkFinish(int queueNo) {
-
-    }
-
-    @Override
-    public void checkIn(Boolean statue) {
-
-    }
-
-    @Override
-    public void loadProcess(JSONObject object) {
-
-    }
-
-    @Override
-    public void loadAllprocess(JSONArray jsonArray) {
-
     }
 
     public void onBackPressed()

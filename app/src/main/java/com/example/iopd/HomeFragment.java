@@ -2,7 +2,9 @@ package com.example.iopd;
 
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,6 +29,10 @@ public class HomeFragment extends Fragment{
     protected TextView right;
     private CardView suggestion,process;
     private int stateForTrement;
+    Handler handle;
+    Runnable runable;
+
+    SwipeRefreshLayout swipeRefreshLayout;
 
 
     public HomeFragment() {
@@ -73,6 +79,25 @@ public class HomeFragment extends Fragment{
                 ((MainMenuActivity)getActivity()).setViewPager(3);
             }
         });
+        swipeRefreshLayout = (SwipeRefreshLayout) root.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                handle = new Handler();
+                runable = new Runnable() {
+
+                    @Override
+                    public void run() {
+                        swipeRefreshLayout.setRefreshing(false);
+                        ((MainMenuActivity)getActivity()).checkAppointment();
+                        ((MainMenuActivity)getActivity()).checkProcess();
+                        ((MainMenuActivity)getActivity()).checkStatusInProccess();
+                        handle.removeCallbacks(runable); // stop runable.
+                    }
+                };
+                handle.postDelayed(runable, 3000); // delay 3 s.
+            }
+        });
 
         return root;
     }
@@ -80,16 +105,16 @@ public class HomeFragment extends Fragment{
 
     protected void changeState(String state, String place, int remain){
 
-        Log.d("pppppp","PPPP state "+state+" place "+place+" remain "+remain);
         if(state == null){
             state = "-";
         }
         if(place == null){
             place = "-";
         }
+        when.setText(String.valueOf(remain));
         where.setText(place);
         doing.setText(state);
-        when.setText(String.valueOf(remain));
+
     }
 
     protected void updateQueue(int tempInt){

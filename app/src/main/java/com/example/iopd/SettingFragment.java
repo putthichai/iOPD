@@ -32,8 +32,8 @@ public class SettingFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_setting, container, false);
         CardView logout = root.findViewById(R.id.logout);
-        final Switch gps = root.findViewById(R.id.acceptLocation);
-
+        gps = root.findViewById(R.id.acceptLocation);
+        gps.setChecked(((MainMenuActivity)getActivity()).getStatusGPS());
         gps.setTextOff("Off");
         gps.setTextOn("On");
         gps.setOnClickListener(new View.OnClickListener() {
@@ -43,16 +43,16 @@ public class SettingFragment extends Fragment {
                 if(switchState){
                     ((MainMenuActivity)getActivity()).turnOnGPS();
                     gps.setTextOn("On");
-
+                    ((MainMenuActivity)getActivity()).setStatusGPS(true);
                     Log.d("ssssssssssssssssss","On");
                 }else{
                     ((MainMenuActivity)getActivity()).turnOffGPS();
                     gps.setTextOff("Off");
+                    ((MainMenuActivity)getActivity()).setStatusGPS(false);
                     Log.d("ssssssssssssssssss","Off");
                 }
             }
         });
-
 
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,5 +62,10 @@ public class SettingFragment extends Fragment {
         });
         return root;
     }
+
+    protected void checkStatusGPS(boolean b){
+        gps.setChecked(b);
+    }
+
 
 }

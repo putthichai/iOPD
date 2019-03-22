@@ -1,8 +1,6 @@
 package com.example.iopd;
 
-import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,25 +17,21 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
 
-public class AllProcessesApi extends AsyncTask<String, Integer, JSONArray> {
+public class CheckStatusInProcess extends AsyncTask<String, Integer, Boolean> {
 
-    private int workflowId;
-    private iOPD mCallback;
-
-    public AllProcessesApi(int workflowId, Context context){
-        this.workflowId = workflowId;
-        mCallback = (iOPD) context;
+    private int queueNo;
+    public CheckStatusInProcess(int queueNo){
+        this.queueNo = queueNo;
     }
 
     @Override
-    protected JSONArray doInBackground(String... strings) {
+    protected Boolean doInBackground(String... strings) {
         try {
             URL url = new URL(strings[0]);
-            String data = URLEncoder.encode("workflowId", "UTF-8")
-                    + "=" + URLEncoder.encode(String.valueOf(workflowId), "UTF-8");
+            String data = URLEncoder.encode("queueNo", "UTF-8")
+                    + "=" + URLEncoder.encode(String.valueOf(queueNo), "UTF-8");
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
             conn.setRequestMethod("POST");
             conn.setReadTimeout(10000);
             conn.setReadTimeout(15000);
@@ -65,7 +59,7 @@ public class AllProcessesApi extends AsyncTask<String, Integer, JSONArray> {
             wr.close();
             reader.close();
             JSONObject jobj = new JSONObject(sb.toString());
-            return  jobj.getJSONArray("results");
+            return  jobj.getBoolean("results");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
@@ -80,11 +74,4 @@ public class AllProcessesApi extends AsyncTask<String, Integer, JSONArray> {
 
         return null;
     }
-
-    @Override
-    protected void onPostExecute(JSONArray jsonArray) {
-        mCallback.loadAllprocess(jsonArray);
-    }
-
-
 }

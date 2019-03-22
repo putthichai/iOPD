@@ -21,14 +21,14 @@ public class RegisterApi extends AsyncTask<String, String, JSONObject> {
     private String username,password,name,surname,email;
     private Context mContext;
     ProgressDialog mProgress;
-    private iOPD mCallback;
+    private iOPD2 mCallback;
 
 
     public RegisterApi(Context context,String name,String surname,String id, String pw,String email){
         mContext = context;
         username = id;
         password = pw;
-        mCallback = (iOPD) context;
+        mCallback = (iOPD2) context;
         this.name = name;
         this.surname = surname;
         this.email = email;

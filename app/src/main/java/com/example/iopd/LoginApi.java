@@ -24,7 +24,7 @@ public class LoginApi extends AsyncTask<String, String, JSONObject> {
    private String username,password;
    private Context mContext;
    ProgressDialog mProgress;
-   private iOPD mCallback;
+   private iOPD2 mCallback;
    private int userId;
 
 
@@ -32,7 +32,7 @@ public class LoginApi extends AsyncTask<String, String, JSONObject> {
         mContext = context;
         username = id;
         password = pw;
-        mCallback = (iOPD) context;
+        mCallback = (iOPD2) context;
 
         Log.d("","111111111  create object");
     }
@@ -103,7 +103,7 @@ public class LoginApi extends AsyncTask<String, String, JSONObject> {
 
     @Override
     protected void onPostExecute(JSONObject object) {
-        //Log.d("","111111111  onPostExecute "+integer);
+        Log.d("","111111111  onPostExecute ");
         mProgress.dismiss();
         mCallback.processFinish(object);
     }
