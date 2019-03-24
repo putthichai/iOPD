@@ -20,6 +20,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/gradient_main_bg"
             android:orientation="vertical">
 
             <android.support.constraint.ConstraintLayout
@@ -41,16 +42,11 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <ImageView
-                        android:id="@+id/imageView3"
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:scaleType="fitXY"
-                        android:src="@drawable/appoi" />
-
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:background="@drawable/gradient_bg">
+
 
                         <TextView
                             android:id="@+id/textView8"
@@ -145,7 +141,7 @@
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/wooden">
+                        android:background="@drawable/gradient_queueno">
 
                         <TextView
                             android:id="@+id/textView107"
@@ -189,7 +185,7 @@
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
-                        android:background="@drawable/orange_paper">
+                        android:background="@drawable/gradient_process">
 
                         <TextView
                             android:id="@+id/textView20"
@@ -288,7 +284,7 @@
                 <RelativeLayout
                     android:layout_width="403dp"
                     android:layout_height="106dp"
-                    android:background="@drawable/blur_rest">
+                    android:background="@drawable/gradient_place">
 
                     <TextView
                         android:id="@+id/textView16"
@@ -310,23 +306,15 @@
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/settingCV"
-                    android:layout_width="90dp"
-                    android:layout_height="80dp"
+                    android:layout_width="88dp"
+                    android:layout_height="77dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
-                    android:background="@drawable/settings"
 
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
-
-                    <ImageView
-                        android:id="@+id/settingText"
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:scaleType="fitXY"
-                        android:src="@drawable/settings" />
 
                     <TextView
                         android:id="@+id/textView2"
