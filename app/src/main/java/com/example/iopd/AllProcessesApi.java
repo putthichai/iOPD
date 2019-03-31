@@ -19,22 +19,26 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
 
-public class AllProcessesApi extends AsyncTask<String, Integer, JSONArray> {
+public class AllProcessesApi extends AsyncTask<String, Integer, JSONObject> {
 
-    private int workflowId;
+    private int workflowId,queueNo;
     private iOPD mCallback;
 
-    public AllProcessesApi(int workflowId, Context context){
+    public AllProcessesApi(int queueNo,int workflowId, Context context){
         this.workflowId = workflowId;
+        this.queueNo = queueNo;
         mCallback = (iOPD) context;
     }
 
     @Override
-    protected JSONArray doInBackground(String... strings) {
+    protected JSONObject doInBackground(String... strings) {
         try {
             URL url = new URL(strings[0]);
-            String data = URLEncoder.encode("workflowId", "UTF-8")
-                    + "=" + URLEncoder.encode(String.valueOf(workflowId), "UTF-8");
+            String data = URLEncoder.encode("queueNo", "UTF-8")
+                    + "=" + URLEncoder.encode(String.valueOf(queueNo), "UTF-8");
+
+            data += "&" + URLEncoder.encode("workflowId", "UTF-8") + "="
+                    + URLEncoder.encode(String.valueOf(workflowId), "UTF-8");
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
@@ -64,8 +68,10 @@ public class AllProcessesApi extends AsyncTask<String, Integer, JSONArray> {
             conn.disconnect();
             wr.close();
             reader.close();
+            Log.d("22222222222",sb.toString());
             JSONObject jobj = new JSONObject(sb.toString());
-            return  jobj.getJSONArray("results");
+
+            return  jobj;
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
@@ -82,8 +88,8 @@ public class AllProcessesApi extends AsyncTask<String, Integer, JSONArray> {
     }
 
     @Override
-    protected void onPostExecute(JSONArray jsonArray) {
-        mCallback.loadAllprocess(jsonArray);
+    protected void onPostExecute(JSONObject jsonObject) {
+        mCallback.loadAllprocess(jsonObject);
     }
 
 

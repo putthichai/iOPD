@@ -16,6 +16,6 @@ public interface iOPD {
 
     void loadProcess(JSONObject object);
 
-    void loadAllprocess(JSONArray jsonArray);
+    void loadAllprocess(JSONObject jsonObject);
 
 }

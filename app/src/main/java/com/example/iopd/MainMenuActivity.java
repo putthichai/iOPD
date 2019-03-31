@@ -86,6 +86,18 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main_menu);
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+            return;
+        }
+
         sessionManager = new SessionManager(this);
         queueSession = new QueueSession(this);
         sessionManager.checkLogin();
@@ -402,23 +414,27 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
     }
 
     @Override
-    public void loadAllprocess(JSONArray jsonArray) {
+    public void loadAllprocess(JSONObject jsonObject) {
         Log.d("222222222222","load value all process");
-
-        if(jsonArray != null){
-            String[] name = new String[jsonArray.length()];
-            int[] id = new int[jsonArray.length()];
             try {
-                for(int i=0; i<jsonArray.length();i++){
-                    JSONObject temp = jsonArray.getJSONObject(i);
-                    name[i] = temp.getString("name");
-                    id[i] =(temp.getInt("queueTypeId"));
+
+                if(jsonObject.getInt("status") == 200){
+                    int tempNum = jsonObject.getJSONArray("results").length();
+                    String[] name = new String[tempNum];
+                    int[] id = new int[tempNum];
+                    for(int i=0; i<tempNum;i++){
+                        JSONObject temp = jsonObject.getJSONArray("results").getJSONObject(i);
+                        name[i] = temp.getString("name");
+                        id[i] = jsonObject.getJSONArray("state").getInt(i);
+                    }
+                    process.setProcess(name,id);
                 }
-                process.setProcess(name,id);
+
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }
+
 
         //process.setProcess();
     }
@@ -523,7 +539,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
 
     public void callAllProcess(){
         Log.d("2222222222","callAllProcesses");
-        new AllProcessesApi(patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=getAllProcesses");
+        new AllProcessesApi(queueNo,patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=checkStateInProcess");
     }
 
     public void checkAppointment(){
@@ -554,6 +570,8 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD{
         }
 
     }
+
+
 
 
 }

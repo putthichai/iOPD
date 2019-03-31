@@ -7,8 +7,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.github.vipulasri.timelineview.TimelineView;
-
 public class CustomAdapter extends BaseAdapter {
 
      Context mContext;
@@ -45,16 +43,29 @@ public class CustomAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater mInflater =
-                (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater mInflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        if(convertView == null)
-            convertView = mInflater.inflate(R.layout.listview_row, parent, false);
+        if(convertView == null){
+            if(order[position] == 0 && position == order.length -1){
+                convertView = mInflater.inflate(R.layout.statusdetail_last_out, parent, false);
+                TextView textView = (TextView)convertView.findViewById(R.id.TLname);
+                textView.setText(processName[position]);
+            }else if(order[position] == 1 && position == order.length -1){
+                convertView = mInflater.inflate(R.layout.statusdetail_last_in, parent, false);
+                TextView textView = (TextView)convertView.findViewById(R.id.TLname);
+                textView.setText(processName[position]);
+            }
+            else if(order[position] == 1){
+                convertView = mInflater.inflate(R.layout.statusdetail_in, parent, false);
+                TextView textView = (TextView)convertView.findViewById(R.id.TLname);
+                textView.setText(processName[position]);
+            }else if(order[position] == 0){
+                convertView = mInflater.inflate(R.layout.statusdetail_out, parent, false);
+                TextView textView = (TextView)convertView.findViewById(R.id.TLname);
+                textView.setText(processName[position]);
+            }
+        }
 
-        TextView textView = (TextView)convertView.findViewById(R.id.TLname);
-        textView.setText(processName[position]);
-
-        TimelineView timelineView= (TimelineView) convertView.findViewById(R.id.timeline4);
 
         return convertView;
     }
