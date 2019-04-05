@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,7 +15,11 @@ import android.widget.Toast;
 
 import com.example.iopd.api.LoginApi;
 import com.example.iopd.R;
+import com.example.iopd.api.updateTokenToServer;
 import com.example.iopd.app.SessionManager;
+import com.example.iopd.service.MyFirebaseInstanceIDService;
+import com.example.iopd.service.SharedPrefManager;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -86,7 +91,6 @@ public class LoginActivity extends AppCompatActivity implements iOPD2 {
                 tempId = output.getJSONObject("results").getInt("user_id");
                 tempFirst = output.getJSONObject("results").getString("firstname");
                 tempSur = output.getJSONObject("results").getString("surname");
-
             } catch (JSONException e) {
                 e.printStackTrace();
 
@@ -94,6 +98,10 @@ public class LoginActivity extends AppCompatActivity implements iOPD2 {
 
             if(tempStatus == 200){
                 sessionManager.createLoginSession(tempFirst,tempSur,String.valueOf(tempId));
+                String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+                SharedPrefManager.getInstance(getApplicationContext()).saveDeviceToken(refreshedToken);
+                Log.d("444444444444444","id  "+tempId+"  "+refreshedToken);
+                new updateTokenToServer(tempId,refreshedToken).execute("https://iopdapi.ml/?function=updatePatientToken");
                 Intent intent = new Intent(LoginActivity.this, MainMenuActivity.class);
                 startActivity(intent);
                 finish();

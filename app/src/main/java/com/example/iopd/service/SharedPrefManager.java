@@ -3,12 +3,17 @@ package com.example.iopd.service;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.google.firebase.iid.FirebaseInstanceId;
+
+import java.io.IOException;
+
 public class SharedPrefManager {
     private static final String SHARED_PREF_NAME = "FCMSharedPref";
     private static final String TAG_TOKEN = "tagtoken";
 
     private static SharedPrefManager mInstance;
     private static Context mCtx;
+
 
     private SharedPrefManager(Context context) {
         mCtx = context;
@@ -34,5 +39,20 @@ public class SharedPrefManager {
     public String getDeviceToken(){
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
         return  sharedPreferences.getString(TAG_TOKEN, null);
+    }
+
+    public void deleteDeviceToken(){
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.commit();
+        try {
+            FirebaseInstanceId.getInstance().deleteToken("THEIR_SENDER_ID", "FCM");
+            FirebaseInstanceId.getInstance().deleteInstanceId();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

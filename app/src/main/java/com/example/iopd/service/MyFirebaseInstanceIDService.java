@@ -56,4 +56,5 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
         //saving the token on shared preferences
         SharedPrefManager.getInstance(getApplicationContext()).saveDeviceToken(token);
     }
+
 }

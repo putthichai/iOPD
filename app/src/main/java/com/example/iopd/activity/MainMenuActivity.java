@@ -35,6 +35,7 @@ import com.example.iopd.api.AppointmentApi;
 import com.example.iopd.api.BookmarkQueue;
 import com.example.iopd.api.CallApi;
 import com.example.iopd.api.CheckStatusInProcess;
+import com.example.iopd.api.updateTokenToServer;
 import com.example.iopd.app.Config;
 import com.example.iopd.app.Patient;
 import com.example.iopd.api.ProcessApi;
@@ -45,11 +46,13 @@ import com.example.iopd.app.SessionManager;
 import com.example.iopd.service.MyFirebaseInstanceIDService;
 import com.example.iopd.service.SharedPrefManager;
 import com.example.iopd.utils.NotificationUtils;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
@@ -533,7 +536,8 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         }
         queueSession.clearSession();
         sessionManager.logout();
-
+        SharedPrefManager.getInstance(this).deleteDeviceToken();
+        new updateTokenToServer(patient.getId()," ").execute("https://iopdapi.ml/?function=updatePatientToken");
     }
 
     public void checkProcess(){
@@ -617,6 +621,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         queueNo = 0;
         home.updateQueue(queueNo);
         queueSession.clearSession();
+
         queue = false;
         home.changeState("","",0);
     }
