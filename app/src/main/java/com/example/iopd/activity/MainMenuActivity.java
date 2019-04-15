@@ -167,9 +167,9 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                         message = intent.getStringExtra("message");
                         title = intent.getStringExtra("title");
 
-                        Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
                         setViewPager(2);
-                        notification.setAdapterNotification(message,title);
+                        notification.setAdapterNotification(title,message);
                         checkStatusInProccess();
                     }
                 }
