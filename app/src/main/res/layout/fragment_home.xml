@@ -272,7 +272,7 @@
                             android:text="TextView"
                             android:textSize="18sp"
                             app:layout_constraintEnd_toEndOf="@+id/proDoing"
-                            app:layout_constraintHorizontal_bias="1.0"
+                            app:layout_constraintHorizontal_bias="0.0"
                             app:layout_constraintStart_toStartOf="@+id/proDoing"
                             app:layout_constraintTop_toTopOf="@+id/textView17" />
 

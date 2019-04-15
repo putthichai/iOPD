@@ -114,8 +114,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main_menu);
 
-
-
+        //first request permission
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -128,15 +127,26 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             return;
         }
 
+        //load value from session
         sessionManager = new SessionManager(this);
         queueSession = new QueueSession(this);
         sessionManager.checkLogin();
         if(sessionManager.isLoggin()){
 
+            //set up base value
+            StatusGPS = true;
+            queue = false;
+            backButtonCount =0;
+            currentPage =0;
+            tempconut =0;
+            countLocation =0;
+            stateDoing = "";
+            targetLocation = "";
+            remainQueue = 0;
             message = "";
             title = "";
 
-
+            //create notification
             mRegistrationBroadcastReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
@@ -152,9 +162,10 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                     } else if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
                         // new push notification is received
 
+                        Log.d("tttttttttttttttt",intent.toString());
+
                         message = intent.getStringExtra("message");
                         title = intent.getStringExtra("title");
-
 
                         Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
                         setViewPager(2);
@@ -178,16 +189,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
             patient = new Patient(tempid, tempFN, tempsur);
 
-            //set up
-            StatusGPS = true;
-            queue = false;
-            backButtonCount =0;
-            currentPage =0;
-            tempconut =0;
-            countLocation =0;
-            stateDoing = "";
-            targetLocation = "";
-            remainQueue = 0;
+
 
             //setup page
             mViewPage = findViewById(R.id.fragment);
@@ -208,7 +210,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
             bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-
             turnOnGPS();
 
         }
@@ -217,10 +218,8 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             checkProcess();
         }
 
-
-
     }
-
+    //check device token(debug)
     private void displayFirebaseRegId() {
         SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
         String regId = pref.getString("regId", null);
@@ -246,7 +245,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     //change page
     public void setViewPager(int page){
         if(page == 0){
-            //mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(home,"Home");
             currentPage = 0;
@@ -257,20 +255,17 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             checkProcess();
 
         }else if(page == 1){
-            //mViewPage.removeAllViews();
             currentPage = 1;
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(place,"Suggestion location");
             mViewPage.setAdapter(adapter);
             checkProcess();
         }else if(page == 2){
-            //mViewPage.removeAllViews();
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(notification,"Notification");
             mViewPage.setAdapter(adapter);
             currentPage =2;
         }else if(page == 3){
-            //mViewPage.removeAllViews();
             currentPage = 3;
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(process,"Progress");
@@ -283,7 +278,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             //mViewPage.setAdapter(adapter);
             //currentPage = 4;
         }else if(page == 5){
-            //mViewPage.removeAllViews();
             currentPage = 5;
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(settingFragment,"Setting");
@@ -293,7 +287,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     }
 
 
-    //set value back bottom
+    //set action back bottom
     @Override
     public void onBackPressed()
     {
@@ -428,7 +422,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
     @Override
     public void bookmarkFinish(int queueNo) {
-        //Log.d("cccccccccccccccc","bbbbbbb end to bookmark");
         this.queueNo = queueNo;
         queueSession.createSession(queueNo);
         home.updateQueue(queueNo);
@@ -439,16 +432,11 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
     @Override
     public void checkIn(Boolean statue) {
-        //Toast.makeText(getApplicationContext(),"Network connection is not avalilable "+haveNetwork()+"   "+statue,Toast.LENGTH_SHORT).show();
         if(statue && haveNetwork()){
-            //Log.d("cccccccccccccccc","bbbbbbb In area");
             bookmarkQueue();
         }else if(!haveNetwork()){
-            //Log.d("cccccccccccccccc","bbbbbbb not In area");
             Toast.makeText(getApplicationContext(),"Network connection is not avalilable",Toast.LENGTH_SHORT).show();
             countLocation = 0;
-            //locationManager.removeUpdates(locationListener);
-            //locationManager = null;
         }else if(!statue){
             Toast.makeText(getApplicationContext(),"Out of reach",Toast.LENGTH_SHORT).show();
             countLocation = 0;
