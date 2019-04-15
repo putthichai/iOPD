@@ -133,7 +133,7 @@ public class AppointmentApi extends AsyncTask<String, Integer, JSONObject> {
             e.printStackTrace();
         }
 
-        return result;
+        return null;
     }
 
     @Override

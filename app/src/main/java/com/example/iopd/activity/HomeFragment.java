@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,15 +85,21 @@ public class HomeFragment extends Fragment{
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+
                 handle = new Handler();
                 runable = new Runnable() {
 
                     @Override
                     public void run() {
+
                         swipeRefreshLayout.setRefreshing(false);
                         ((MainMenuActivity)getActivity()).checkAppointment();
-                        ((MainMenuActivity)getActivity()).checkProcess();
-                        ((MainMenuActivity)getActivity()).checkStatusInProccess();
+                        Log.d("0000000000000000000",""+MainMenuActivity.getQueueNo());
+                        if(MainMenuActivity.getQueueNo() != 0){
+                            ((MainMenuActivity)getActivity()).checkProcess();
+                            ((MainMenuActivity)getActivity()).checkStatusInProccess();
+                        }
+
                         handle.removeCallbacks(runable); // stop runable.
                     }
                 };

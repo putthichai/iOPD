@@ -36,6 +36,7 @@ public class NotificationFragment extends Fragment {
         //notific = root.findViewById(R.id.cvNotification);
         title = root.findViewById(R.id.ndTopic);
         message = root.findViewById(R.id.ndDetail);
+
         setAdapterNotification(((MainMenuActivity)getActivity()).getSubject(),((MainMenuActivity)getActivity()).getMessage());
         return root;
     }

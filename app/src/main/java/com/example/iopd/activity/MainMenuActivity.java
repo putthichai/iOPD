@@ -53,6 +53,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
@@ -153,8 +157,9 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
 
                         Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
-
+                        setViewPager(2);
                         notification.setAdapterNotification(message,title);
+                        checkStatusInProccess();
                     }
                 }
             };
@@ -165,19 +170,12 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                 queueNo = 0;
             }
 
-
-            //create patient
-            //Intent tempIntent = getIntent();
-            //Bundle bundle = tempIntent.getExtras();
             HashMap<String, String> user = sessionManager.getUserDetail();
 
             int tempid = Integer.valueOf(user.get(sessionManager.ID));
             String tempFN = user.get(sessionManager.NAME);
             String tempsur = user.get(sessionManager.SURNAME);
 
-            //int tempid = bundle.getInt("id");
-            //String tempFN = bundle.getString("firstname");
-            //String tempsur = bundle.getString("surname");
             patient = new Patient(tempid, tempFN, tempsur);
 
             //set up
@@ -187,15 +185,12 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             currentPage =0;
             tempconut =0;
             countLocation =0;
-
-            //
             stateDoing = "";
             targetLocation = "";
             remainQueue = 0;
 
             //setup page
             mViewPage = findViewById(R.id.fragment);
-
             home = new HomeFragment();
             notification = new NotificationFragment();
             process = new ProcessFragment();
@@ -397,30 +392,30 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
     @Override
     public void getIdRoom(final int idRoom) {
-        if(tempconut == 0){
-            AlertDialog.Builder builder =
-                    new AlertDialog.Builder(MainMenuActivity.this);
-            builder.setMessage("คุณต้องการจองคิวมั้ยคะ?");
-            builder.setPositiveButton("ตกลง", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    new BookmarkQueue(patient.getId(),idRoom,patient.getAppointmentId(),patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=addQueue");
-                    Toast.makeText(getApplicationContext(), "คุณได้ทำการจองคิวแล้วคะ", Toast.LENGTH_SHORT).show();
-                }
-            });
-            builder.setNegativeButton("ยกเลิก", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    //dialog.dismiss();
-                    turnOffGPS();
-                    StatusGPS = false;
-                    countLocation = 0;
-                    tempconut = 0;
-                }
-            });
-            builder.show();
-            tempconut++;
-        }
 
+            if(tempconut == 0){
+                AlertDialog.Builder builder =
+                        new AlertDialog.Builder(MainMenuActivity.this);
+                builder.setMessage("คุณต้องการจองคิวมั้ยคะ?");
+                builder.setPositiveButton("ตกลง", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        new BookmarkQueue(patient.getId(),idRoom,patient.getAppointmentId(),patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=addQueue");
+                        Toast.makeText(getApplicationContext(), "คุณได้ทำการจองคิวแล้วคะ", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                builder.setNegativeButton("ยกเลิก", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //dialog.dismiss();
+                        turnOffGPS();
+                        StatusGPS = false;
+                        countLocation = 0;
+                        tempconut = 0;
+                    }
+                });
+                builder.show();
+                tempconut++;
+            }
     }
 
     protected void setStatusGPS(boolean b){
@@ -567,7 +562,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             @Override
             public void onLocationChanged(Location location) {
                 //Log.d("cccccccccccccccc","bbbbbbb in onLocationChanged function");
-                if(countLocation == 0 && queueNo == 0){
+                if(countLocation == 0 && queueNo == 0 && isInternetConnection()){
                     //Log.d("cccccccccccccccc","bbbbbbb start to check in area");
                     new CallApi(location.getLatitude(),location.getLongitude(),MainMenuActivity.this).execute("CheckInArea");
                     countLocation++;
@@ -591,8 +586,8 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         };
 
 
-        locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 5000, 0, locationListener);
-        locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER, 5000, 0, locationListener);
+        locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 10000, 0, locationListener);
+        locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER, 10000, 0, locationListener);
 
     }
 
@@ -607,7 +602,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     }
 
     public void callAllProcess(){
-        Log.d("2222222222","callAllProcesses");
+       if(isInternetConnection())
         new AllProcessesApi(queueNo,patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=checkStateInProcess");
     }
 
@@ -616,13 +611,15 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     }
 
     public void finishProcess(){
-        turnOffGPS();
-        checkAppointment();
+            turnOffGPS();
+            checkAppointment();
         queueNo = 0;
         home.updateQueue(queueNo);
         queueSession.clearSession();
-
         queue = false;
+        stateDoing = "";
+        targetLocation = "";
+        remainQueue = 0;
         home.changeState("","",0);
     }
 
@@ -630,7 +627,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         try {
             Boolean status = new CheckStatusInProcess(queueNo).execute("https://iopdapi.ml/?function=checkStatusInProcess").get();
             Log.d("333333333333333333",""+status);
-            if(!status){
+            if(status == false){
                 finishProcess();
             }
         } catch (InterruptedException e) {
@@ -686,6 +683,15 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         }
 
     }
+
+    public  boolean isInternetConnection()
+    {
+
+        ConnectivityManager connectivityManager =  (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        return connectivityManager.getActiveNetworkInfo().isConnectedOrConnecting();
+    }
+
+
 
 
 

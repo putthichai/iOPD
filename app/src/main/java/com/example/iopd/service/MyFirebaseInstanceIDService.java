@@ -30,6 +30,7 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
 
         //calling the method store token and passing token
         storeToken(refreshedToken);
+        sendRegistrationToServer(refreshedToken);
     }
 
     private void sendRegistrationToServer(String refreshedToken) {

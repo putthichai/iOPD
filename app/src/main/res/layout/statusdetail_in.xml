@@ -29,6 +29,8 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="TextView"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/nextProcess"
         app:layout_constraintStart_toEndOf="@+id/statusProcess"
         app:layout_constraintTop_toTopOf="@+id/statusProcess" />
