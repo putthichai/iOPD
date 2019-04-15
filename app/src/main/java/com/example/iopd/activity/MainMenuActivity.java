@@ -37,7 +37,7 @@ import com.example.iopd.api.CallApi;
 import com.example.iopd.api.CheckStatusInProcess;
 import com.example.iopd.api.updateTokenToServer;
 import com.example.iopd.app.Config;
-import com.example.iopd.app.Patient;
+import com.example.iopd.utils.Patient;
 import com.example.iopd.api.ProcessApi;
 import com.example.iopd.app.QueueSession;
 import com.example.iopd.R;
@@ -46,17 +46,11 @@ import com.example.iopd.app.SessionManager;
 import com.example.iopd.service.MyFirebaseInstanceIDService;
 import com.example.iopd.service.SharedPrefManager;
 import com.example.iopd.utils.NotificationUtils;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
@@ -87,9 +81,9 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     private String message,title,token;
     private MyFirebaseInstanceIDService myFirebaseInstanceIDService;
 
+    //set action bottom bar
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
@@ -106,15 +100,14 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         }
     };
 
-
-
+    //start activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main_menu);
 
-        //first request permission
+        //first check request permission
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -146,7 +139,21 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             message = "";
             title = "";
 
-            //create notification
+            //create page
+            mViewPage = findViewById(R.id.fragment);
+            home = new HomeFragment();
+            notification = new NotificationFragment();
+            process = new ProcessFragment();
+            place = new PlaceFragment();
+            settingFragment = new SettingFragment();
+
+            //link with main activity
+            setupViewPager(mViewPage);
+            right = findViewById(R.id.right);
+            fullname = findViewById(R.id.name);
+            fullname.setText(patient.getFullname());
+
+            //active notification
             mRegistrationBroadcastReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
@@ -156,14 +163,10 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                         // gcm successfully registered
                         // now subscribe to `global` topic to receive app wide notifications
                         FirebaseMessaging.getInstance().subscribeToTopic(Config.TOPIC_GLOBAL);
-
                         displayFirebaseRegId();
 
                     } else if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
                         // new push notification is received
-
-                        Log.d("tttttttttttttttt",intent.toString());
-
                         message = intent.getStringExtra("message");
                         title = intent.getStringExtra("title");
 
@@ -189,31 +192,13 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
             patient = new Patient(tempid, tempFN, tempsur);
 
-
-
-            //setup page
-            mViewPage = findViewById(R.id.fragment);
-            home = new HomeFragment();
-            notification = new NotificationFragment();
-            process = new ProcessFragment();
-            place = new PlaceFragment();
-            settingFragment = new SettingFragment();
-
-            //link with mainmenu
-            setupViewPager(mViewPage);
-            right = findViewById(R.id.right);
-            fullname = findViewById(R.id.name);
-            fullname.setText(patient.getFullname());
-
             checkAppointment();
 
             BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
             bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
             turnOnGPS();
-
         }
-
         if(queueNo != 0){
             checkProcess();
         }
@@ -230,8 +215,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             token = regId;
         else
            token = "Firebase Reg Id is not received yet!";
-
-
     }
 
 
@@ -253,7 +236,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             home.setTime(patient.getTimeStart(),patient.getTimeEnd());
             checkAppointment();
             checkProcess();
-
         }else if(page == 1){
             currentPage = 1;
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
@@ -320,6 +302,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         }
     }
 
+    //start booking queue after check you are in the hospital area and have appointment
     protected void bookmarkQueue(){
         if(patient.haveAppointment()){
             new CallApi(patient.getDoctor(),MainMenuActivity.this).execute("getRoomScheduleByEmployeeId");
@@ -330,7 +313,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
         if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
             if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
                // locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 5000, 0, locationListener);
@@ -455,8 +437,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                         place.setRemainQueue(object.getJSONObject("results").getInt("remainQueue"));
                     }
                 }
-
-
             }
 
         } catch (JSONException e) {
@@ -466,9 +446,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
     @Override
     public void loadAllprocess(JSONObject jsonObject) {
-        Log.d("222222222222","load value all process");
             try {
-
                 if(jsonObject.getInt("status") == 200){
                     int tempNum = jsonObject.getJSONArray("results").length();
                     String[] name = new String[tempNum];
@@ -480,16 +458,12 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                     }
                     process.setProcess(name,id);
                 }
-
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-
-        //process.setProcess();
     }
 
+    // check internet
     private boolean haveNetwork(){
         boolean have_WIFI = false;
         boolean have_MOBILEDATA = false;
@@ -572,7 +546,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
             }
         };
-
 
         locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 10000, 0, locationListener);
         locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER, 10000, 0, locationListener);
@@ -658,9 +631,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     }
 
     public void showToken(){
-
         token = SharedPrefManager.getInstance(this).getDeviceToken();
-
         //if token is not null
         if (token != null) {
             //displaying the token
@@ -669,18 +640,11 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             //if token is null that means something wrong
             Log.d("555555555555555555555","Token not generated");
         }
-
     }
 
     public  boolean isInternetConnection()
     {
-
         ConnectivityManager connectivityManager =  (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         return connectivityManager.getActiveNetworkInfo().isConnectedOrConnecting();
     }
-
-
-
-
-
 }
