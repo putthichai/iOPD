@@ -33,8 +33,6 @@ public class LoginApi extends AsyncTask<String, String, JSONObject> {
         username = id;
         password = pw;
         mCallback = (iOPD2) context;
-
-        Log.d("","111111111  create object");
     }
 
     @Override
@@ -42,7 +40,6 @@ public class LoginApi extends AsyncTask<String, String, JSONObject> {
         mProgress = new ProgressDialog(mContext);
         mProgress.setMessage("Please wait...");
         mProgress.show();
-        Log.d("","111111111 onPreExecute");
     }
 
     @Override
@@ -83,10 +80,7 @@ public class LoginApi extends AsyncTask<String, String, JSONObject> {
             conn.disconnect();
             wr.close();
             reader.close();
-            Log.d("","111111111  "+sb.toString());
             jobj = new JSONObject(sb.toString());
-
-            Log.d("","111111111  end doInBackground");
             return jobj;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -103,7 +97,6 @@ public class LoginApi extends AsyncTask<String, String, JSONObject> {
 
     @Override
     protected void onPostExecute(JSONObject object) {
-        Log.d("","111111111  onPostExecute ");
         mProgress.dismiss();
         mCallback.processFinish(object);
     }

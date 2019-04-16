@@ -34,8 +34,6 @@ public class RegisterApi extends AsyncTask<String, String, JSONObject> {
         this.name = name;
         this.surname = surname;
         this.email = email;
-
-        Log.d("","111111111  create object");
     }
 
     @Override
@@ -43,12 +41,10 @@ public class RegisterApi extends AsyncTask<String, String, JSONObject> {
         mProgress = new ProgressDialog(mContext);
         mProgress.setMessage("Please wait...");
         mProgress.show();
-        Log.d("","111111111 onPreExecute");
     }
 
     @Override
     protected JSONObject doInBackground(String... strings) {
-        Log.d("","111111111  start doInBackground");
         JSONObject jobj = null;
         int status = 0;
         try {
@@ -93,7 +89,6 @@ public class RegisterApi extends AsyncTask<String, String, JSONObject> {
 
             jobj = new JSONObject(sb.toString());
             status = jobj.getInt("status");
-            Log.d("","111111111  end doInBackground");
             return jobj;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -108,7 +103,6 @@ public class RegisterApi extends AsyncTask<String, String, JSONObject> {
 
     @Override
     protected void onPostExecute(JSONObject integer) {
-        //Log.d("","111111111  onPostExecute "+integer);
         mProgress.dismiss();
         mCallback.processFinish(integer);
     }
