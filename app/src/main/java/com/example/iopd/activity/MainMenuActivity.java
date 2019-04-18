@@ -55,6 +55,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -386,7 +387,18 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
     @Override
     public void getIdRoom(final int idRoom) {
-
+        LocalTime currenttime = LocalTime.now();
+        String[] tempStart = patient.getTimeStart().split(":");
+        int tempHourStart = Integer.parseInt(tempStart[0]);
+        int tempMinStart = Integer.parseInt(tempStart[1]);
+        int tempSecStart = Integer.parseInt(tempStart[2]);
+        String[] tempEnd = patient.getTimeEnd().split(":");
+        int tempHourEnd = Integer.parseInt(tempEnd[0]);
+        int tempMinEnd = Integer.parseInt(tempEnd[1]);
+        int tempSecend = Integer.parseInt(tempEnd[2]);
+        LocalTime timeStar = LocalTime.of(tempHourStart,tempMinStart,tempSecStart);
+        LocalTime timeEnd = LocalTime.of(tempHourEnd,tempMinEnd,tempSecend);
+        if(currenttime.isAfter(timeStar) && currenttime.isBefore(timeEnd)){
             if(tempconut == 0){
                 AlertDialog.Builder builder =
                         new AlertDialog.Builder(MainMenuActivity.this);
@@ -400,7 +412,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                 builder.setNegativeButton("ยกเลิก", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //dialog.dismiss();
                         turnOffGPS();
                         StatusGPS = false;
                         countLocation = 0;
@@ -410,6 +421,10 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                 builder.show();
                 tempconut++;
             }
+        }else{
+            Toast.makeText(getApplicationContext(),"Please booking in the appointment time", Toast.LENGTH_LONG).show();
+        }
+
     }
 
     protected void setStatusGPS(boolean b){
