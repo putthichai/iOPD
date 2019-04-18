@@ -63,6 +63,7 @@ public class ProcessApi extends AsyncTask<String, Integer, JSONObject> {
             reader.close();
             wr.close();
             JSONObject jobj = new JSONObject(sb.toString());
+            Log.d("vvvvvvvv",jobj.toString());
             return jobj;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();

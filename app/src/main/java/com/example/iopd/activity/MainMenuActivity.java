@@ -51,11 +51,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.sql.Time;
-import java.text.SimpleDateFormat;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
@@ -112,12 +107,24 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main_menu);
 
+        //first check request permission
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+            return;
+        }
+
         //load value from session
         sessionManager = new SessionManager(this);
         queueSession = new QueueSession(this);
         sessionManager.checkLogin();
         if(sessionManager.isLoggin()){
-            //first check request permission
 
             //set up base value
             StatusGPS = true;
@@ -144,7 +151,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             setupViewPager(mViewPage);
             right = findViewById(R.id.right);
             fullname = findViewById(R.id.name);
-
+            fullname.setText(patient.getFullname());
 
             //active notification
             mRegistrationBroadcastReceiver = new BroadcastReceiver() {
@@ -184,7 +191,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             String tempsur = user.get(sessionManager.SURNAME);
 
             patient = new Patient(tempid, tempFN, tempsur);
-            fullname.setText(patient.getFullname());
 
             checkAppointment();
 
@@ -362,18 +368,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
     @Override
     public void getIdRoom(final int idRoom) {
-        LocalTime currenttime = LocalTime.now();
-        String[] tempStart = patient.getTimeStart().split(":");
-        int tempHourStart = Integer.parseInt(tempStart[0]);
-        int tempMinStart = Integer.parseInt(tempStart[1]);
-        int tempSecStart = Integer.parseInt(tempStart[2]);
-        String[] tempEnd = patient.getTimeEnd().split(":");
-        int tempHourEnd = Integer.parseInt(tempEnd[0]);
-        int tempMinEnd = Integer.parseInt(tempEnd[1]);
-        int tempSecend = Integer.parseInt(tempEnd[2]);
-        LocalTime timeStar = LocalTime.of(tempHourStart,tempMinStart,tempSecStart);
-        LocalTime timeEnd = LocalTime.of(tempHourEnd,tempMinEnd,tempSecend);
-        if(currenttime.isAfter(timeStar) && currenttime.isBefore(timeEnd)){
+
             if(tempconut == 0){
                 AlertDialog.Builder builder =
                         new AlertDialog.Builder(MainMenuActivity.this);
@@ -387,6 +382,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                 builder.setNegativeButton("ยกเลิก", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        //dialog.dismiss();
                         turnOffGPS();
                         StatusGPS = false;
                         countLocation = 0;
@@ -396,10 +392,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                 builder.show();
                 tempconut++;
             }
-        }else{
-            Toast.makeText(getApplicationContext(),"Please booking in the appointment time", Toast.LENGTH_LONG).show();
-        }
-
     }
 
     protected void setStatusGPS(boolean b){
@@ -531,7 +523,9 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+                //Log.d("cccccccccccccccc","bbbbbbb in onLocationChanged function");
                 if(countLocation == 0 && queueNo == 0 && isInternetConnection()){
+                    //Log.d("cccccccccccccccc","bbbbbbb start to check in area");
                     new CallApi(location.getLatitude(),location.getLongitude(),MainMenuActivity.this).execute("CheckInArea");
                     countLocation++;
                 }
@@ -593,6 +587,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     public void checkStatusInProccess(){
         try {
             Boolean status = new CheckStatusInProcess(queueNo).execute("https://iopdapi.ml/?function=checkStatusInProcess").get();
+            Log.d("333333333333333333",""+status);
             if(status == false){
                 finishProcess();
             }

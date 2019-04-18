@@ -69,6 +69,7 @@ public class AllProcessesApi extends AsyncTask<String, Integer, JSONObject> {
             conn.disconnect();
             wr.close();
             reader.close();
+            Log.d("22222222222",sb.toString());
             JSONObject jobj = new JSONObject(sb.toString());
 
             return  jobj;
