@@ -300,14 +300,16 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         String tempStatusQueue = "";
         try {
             temp = new getQueue(patient.getId(),patient.getWorkflowId()).execute("https://iopdapi.ml/?function=getQueueByPatientId").get();
-            tempStatus = temp.getInt("status");
-            if(tempStatus == 200){
-                JSONObject temp2 = temp.getJSONObject("results");
-                tempQueueNo = temp2.getInt("queueNo");
-                tempStatusQueue = temp2.getString("status_name");
-            }else{
-                tempQueueNo = 0;
-                tempStatusQueue = "-";
+            if(temp != null){
+                tempStatus = temp.getInt("status");
+                if(tempStatus == 200){
+                    JSONObject temp2 = temp.getJSONObject("results");
+                    tempQueueNo = temp2.getInt("queueNo");
+                    tempStatusQueue = temp2.getString("status_name");
+                }else{
+                    tempQueueNo = 0;
+                    tempStatusQueue = "-";
+                }
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -576,10 +578,11 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         JSONObject temp = null;
         try {
             temp = new ProcessApi(queueNo,patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=getStep").get();
-            Log.d("aaaaaaaaaaaaaa",temp.toString());
-            stateDoing = temp.getJSONObject("results").getString("step");
-            targetLocation = temp.getJSONObject("results").getString("targetPlace");
-            remainQueue = temp.getJSONObject("results").getInt("remainQueue");
+            if(temp != null){
+                stateDoing = temp.getJSONObject("results").getString("step");
+                targetLocation = temp.getJSONObject("results").getString("targetPlace");
+                remainQueue = temp.getJSONObject("results").getInt("remainQueue");
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
             stateDoing = "";
@@ -672,17 +675,18 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         String processName = "";
         try {
             temp = new AppointmentApi(MainMenuActivity.this,patient.getId()).execute("https://iopdapi.ml/?function=getAppointmentByPatientsId").get();
-            Log.d("aaaaaaaaaaaaaa",temp.toString());
-            tempStatus = temp.getInt("status");
-            if(tempStatus == 200){
-                String[] tempDate = temp.getJSONObject("results").getString("date").split("-");
-                date = tempDate[2]+"-"+tempDate[1]+"-"+tempDate[0];
-                patient.setAppointmentDate(date);
-                patient.setAppointment(temp.getJSONObject("results").getInt("employeeId"),temp.getJSONObject("results").getInt("id"));
-                patient.setTime(temp.getJSONObject("results").getString("timeslot_starttime"),temp.getJSONObject("results").getString("timeslot_endtime"));
-                patient.setWorkflowId(temp.getJSONObject("results").getInt("workflowId"));
-                processName = temp.getString("process");
-
+            if(temp != null){
+                Log.d("aaaaaaaaaaaaaa",temp.toString());
+                tempStatus = temp.getInt("status");
+                if(tempStatus == 200){
+                    String[] tempDate = temp.getJSONObject("results").getString("date").split("-");
+                    date = tempDate[2]+"-"+tempDate[1]+"-"+tempDate[0];
+                    patient.setAppointmentDate(date);
+                    patient.setAppointment(temp.getJSONObject("results").getInt("employeeId"),temp.getJSONObject("results").getInt("id"));
+                    patient.setTime(temp.getJSONObject("results").getString("timeslot_starttime"),temp.getJSONObject("results").getString("timeslot_endtime"));
+                    patient.setWorkflowId(temp.getJSONObject("results").getInt("workflowId"));
+                    processName = temp.getString("process");
+                }
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -779,7 +783,17 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     {
 
         ConnectivityManager connectivityManager =  (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        return connectivityManager.getActiveNetworkInfo().isConnectedOrConnecting();
+        boolean temp = false;
+        try{
+            temp = connectivityManager.getActiveNetworkInfo().isConnectedOrConnecting();
+        }catch (NullPointerException e){
+            e.printStackTrace();
+            temp = false;
+        }
+
+
+
+        return temp;
     }
 
 
