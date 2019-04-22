@@ -136,8 +136,4 @@ public class AppointmentApi extends AsyncTask<String, Integer, JSONObject> {
         return null;
     }
 
-    @Override
-    protected void onPostExecute(JSONObject object) {
-        mCallback.processFinish(object);
-    }
 }

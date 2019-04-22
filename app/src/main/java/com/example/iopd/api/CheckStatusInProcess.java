@@ -71,6 +71,6 @@ public class CheckStatusInProcess extends AsyncTask<String, Integer, Boolean> {
             e.printStackTrace();
         }
 
-        return null;
+        return false;
     }
 }

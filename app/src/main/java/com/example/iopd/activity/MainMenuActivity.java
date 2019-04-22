@@ -35,6 +35,7 @@ import com.example.iopd.api.AppointmentApi;
 import com.example.iopd.api.BookmarkQueue;
 import com.example.iopd.api.CallApi;
 import com.example.iopd.api.CheckStatusInProcess;
+import com.example.iopd.api.getQueue;
 import com.example.iopd.api.updateTokenToServer;
 import com.example.iopd.app.Config;
 import com.example.iopd.app.Patient;
@@ -68,8 +69,8 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     private static int queueNo;
     private ViewPager mViewPage;
     private static boolean queue;
-    private static String stateDoing, targetLocation;
-    private static int remainQueue, tempconut;
+    private String stateDoing, targetLocation, statusQueue;
+    private int remainQueue, tempconut;
     private int backButtonCount,countLocation;
     private int currentPage;
     private TextView right ,fullname;
@@ -86,7 +87,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     QueueSession queueSession;
     private BroadcastReceiver mRegistrationBroadcastReceiver;
     private String message,title,token;
-    private MyFirebaseInstanceIDService myFirebaseInstanceIDService;
+
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -101,6 +102,9 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                     return true;
                 case R.id.action_notification:
                     setViewPager(2);
+                    return true;
+                case R.id.action_workflow:
+                    setViewPager(3);
                     return true;
             }
             return false;
@@ -162,16 +166,15 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
                     } else if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
                         // new push notification is received
-
-                        Log.d("tttttttttttttttt",intent.toString());
-
                         message = intent.getStringExtra("message");
                         title = intent.getStringExtra("title");
 
-                        //Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
-                        setViewPager(2);
-                        notification.setAdapterNotification(title,message);
-                        checkStatusInProccess();
+                        if(queueNo != 0){
+                            setViewPager(2);
+                            notification.setAdapterNotification(title,message);
+                            checkStatusInProccess();
+                        }
+
                     }
                 }
             };
@@ -206,18 +209,18 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             fullname = findViewById(R.id.name);
             fullname.setText(patient.getFullname());
 
-            checkAppointment();
-
             BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
             bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-            turnOnGPS();
-
+            checkAppointment();
+            checkQueue();
         }
 
         if(queueNo != 0){
             checkProcess();
         }
+
+        turnOnGPS();
 
     }
     //check device token(debug)
@@ -250,10 +253,13 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             adapter.addFragment(home,"Home");
             currentPage = 0;
             mViewPage.setAdapter(adapter);
-            home.setAppointment(patient.getAppointment());
-            home.setTime(patient.getTimeStart(),patient.getTimeEnd());
             checkAppointment();
+            checkQueue();
             checkProcess();
+            home.onStart();
+            //home.setAppointment(patient.getAppointment());
+            //home.setTime(patient.getTimeStart(),patient.getTimeEnd());
+
 
         }else if(page == 1){
             currentPage = 1;
@@ -284,6 +290,42 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             adapter.addFragment(settingFragment,"Setting");
             mViewPage.setAdapter(adapter);
             settingFragment.checkStatusGPS(StatusGPS);
+        }
+    }
+
+    protected void checkQueue() {
+        JSONObject temp = null;
+        int tempStatus = 400;
+        int tempQueueNo = 0;
+        String tempStatusQueue = "";
+        try {
+            temp = new getQueue(patient.getId(),patient.getWorkflowId()).execute("https://iopdapi.ml/?function=getQueueByPatientId").get();
+            tempStatus = temp.getInt("status");
+            if(tempStatus == 200){
+                JSONObject temp2 = temp.getJSONObject("results");
+                tempQueueNo = temp2.getInt("queueNo");
+                tempStatusQueue = temp2.getString("status_name");
+            }else{
+                tempQueueNo = 0;
+                tempStatusQueue = "-";
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            tempQueueNo = 0;
+            tempStatusQueue = "-";
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            tempQueueNo = 0;
+            tempStatusQueue = "-";
+        } catch (JSONException e) {
+            e.printStackTrace();
+            tempQueueNo = 0;
+            tempStatusQueue = "-";
+        } finally {
+                this.queueNo = tempQueueNo;
+                statusQueue = tempStatusQueue;
+                //home.updateStatus(tempStatusQueue);
+               // home.updateQueue(this.queueNo);
         }
     }
 
@@ -343,45 +385,29 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         return queueNo;
     }
 
-    protected static String getState(){
+    protected String getState(){
         return stateDoing;
     }
 
-    protected static String getTargetLocation(){
+    protected String getTargetLocation(){
         return targetLocation;
     }
 
-    protected static int getRemainQueue(){
+    protected int getRemainQueue(){
         return remainQueue;
     }
 
     protected static Patient getPatient(){
         return patient;
     }
+    protected String getStatusQueue(){
+        return statusQueue;
+    }
 
 
     @Override
     public void processFinish(JSONObject output) {
 
-        try {
-            if(output != null){
-                if(output.getInt("status") == 200){
-                    String[] tempDate = output.getJSONObject("results").getString("date").split("-");
-                    String date = tempDate[2]+"-"+tempDate[1]+"-"+tempDate[0];
-                    patient.setAppointmentDate(date);
-                    patient.setAppointment(output.getJSONObject("results").getInt("employeeId"),output.getJSONObject("results").getInt("id"));
-                    home.setAppointment(date);
-                    patient.setTime(output.getJSONObject("results").getString("timeslot_starttime"),output.getJSONObject("results").getString("timeslot_endtime"));
-                    home.setTime(patient.getTimeStart(),patient.getTimeEnd());
-                    patient.setWorkflowId(output.getJSONObject("results").getInt("workflowId"));
-                    right.setText(output.getString("process"));
-                }
-            }
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
     }
 
@@ -406,7 +432,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                 builder.setPositiveButton("ตกลง", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         new BookmarkQueue(patient.getId(),idRoom,patient.getAppointmentId(),patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=addQueue");
-                        Toast.makeText(getApplicationContext(), "คุณได้ทำการจองคิวแล้วคะ", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "คุณมีนัดใช่มั้ย", Toast.LENGTH_SHORT).show();
                     }
                 });
                 builder.setNegativeButton("ยกเลิก", new DialogInterface.OnClickListener() {
@@ -460,28 +486,36 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
     @Override
     public void loadProcess(JSONObject object) {
-        try {
+        /*try {
             if(object != null){
+                Log.d("aaaaaaaaaaa",object.toString());
                 if(object.getInt("status") == 200){
                     if(currentPage == 0){
-                        home.changeState(object.getJSONObject("results").getString("step"),object.getJSONObject("results").getString("targetPlace"),object.getJSONObject("results").getInt("remainQueue"));
+                        stateDoing = object.getJSONObject("results").getString("step");
+                        targetLocation = object.getJSONObject("results").getString("targetPlace");
+                        remainQueue = object.getJSONObject("results").getInt("remainQueue");
+                        home.changeState(stateDoing,targetLocation,remainQueue);
                     }
                     else if(currentPage == 1){
                         place.setRemainQueue(object.getJSONObject("results").getInt("remainQueue"));
                     }
                 }
-
-
+                else {
+                    statusQueue = "-";
+                    stateDoing = "-";
+                    targetLocation = "-";
+                    remainQueue = 0;
+                    home.onStart();
+                }
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     @Override
     public void loadAllprocess(JSONObject jsonObject) {
-        Log.d("222222222222","load value all process");
             try {
 
                 if(jsonObject.getInt("status") == 200){
@@ -539,7 +573,29 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     }
 
     public void checkProcess(){
-        new ProcessApi(queueNo,MainMenuActivity.this).execute("https://iopdapi.ml/?function=getStep");
+        JSONObject temp = null;
+        try {
+            temp = new ProcessApi(queueNo,patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=getStep").get();
+            Log.d("aaaaaaaaaaaaaa",temp.toString());
+            stateDoing = temp.getJSONObject("results").getString("step");
+            targetLocation = temp.getJSONObject("results").getString("targetPlace");
+            remainQueue = temp.getJSONObject("results").getInt("remainQueue");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            stateDoing = "";
+            targetLocation = "";
+            remainQueue = 0;
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            stateDoing = "";
+            targetLocation = "";
+            remainQueue = 0;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            stateDoing = "";
+            targetLocation = "";
+            remainQueue = 0;
+        }
     }
 
     public void turnOnGPS(){
@@ -610,7 +666,38 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     }
 
     public void checkAppointment(){
-        new AppointmentApi(MainMenuActivity.this,patient.getId()).execute("https://iopdapi.ml/?function=getAppointmentByPatientsId");
+        JSONObject temp = null;
+        int tempStatus = 400;
+        String date = "";
+        String processName = "";
+        try {
+            temp = new AppointmentApi(MainMenuActivity.this,patient.getId()).execute("https://iopdapi.ml/?function=getAppointmentByPatientsId").get();
+            Log.d("aaaaaaaaaaaaaa",temp.toString());
+            tempStatus = temp.getInt("status");
+            if(tempStatus == 200){
+                String[] tempDate = temp.getJSONObject("results").getString("date").split("-");
+                date = tempDate[2]+"-"+tempDate[1]+"-"+tempDate[0];
+                patient.setAppointmentDate(date);
+                patient.setAppointment(temp.getJSONObject("results").getInt("employeeId"),temp.getJSONObject("results").getInt("id"));
+                patient.setTime(temp.getJSONObject("results").getString("timeslot_starttime"),temp.getJSONObject("results").getString("timeslot_endtime"));
+                patient.setWorkflowId(temp.getJSONObject("results").getInt("workflowId"));
+                processName = temp.getString("process");
+
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }finally {
+            Log.d("aaaaaaaaaaaaaaaaaa","status "+tempStatus);
+            if(temp != null && tempStatus == 200){
+                Log.d("aaaaaaaaaaaaaaa",date+"     "+patient.toString()+"       "+home);
+                right.setText(processName);
+            }
+
+        }
     }
 
     public void finishProcess(){
@@ -623,13 +710,14 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         stateDoing = "";
         targetLocation = "";
         remainQueue = 0;
-        home.changeState("","",0);
+        home.changeState("-","-",0);
     }
 
     public void checkStatusInProccess(){
+        Boolean status = false;
         try {
-            Boolean status = new CheckStatusInProcess(queueNo).execute("https://iopdapi.ml/?function=checkStatusInProcess").get();
-            Log.d("333333333333333333",""+status);
+
+            status = new CheckStatusInProcess(queueNo).execute("https://iopdapi.ml/?function=checkStatusInProcess").get();
             if(status == false){
                 finishProcess();
             }
@@ -693,6 +781,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         ConnectivityManager connectivityManager =  (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         return connectivityManager.getActiveNetworkInfo().isConnectedOrConnecting();
     }
+
 
 
 

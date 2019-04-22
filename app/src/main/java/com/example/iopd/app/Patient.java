@@ -17,6 +17,7 @@ public class Patient {
         id = mId;
         name = mName;
         surname = mSurname;
+        workflowId = 0;
         appointment = "";
         timeStart = "";
         timeEnd = "";

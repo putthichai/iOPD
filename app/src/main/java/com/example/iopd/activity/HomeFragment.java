@@ -1,9 +1,13 @@
 package com.example.iopd.activity;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.util.Log;
@@ -14,6 +18,7 @@ import android.widget.TextView;
 
 import com.example.iopd.R;
 import com.example.iopd.activity.MainMenuActivity;
+import com.example.iopd.app.Patient;
 
 
 /**
@@ -28,11 +33,13 @@ public class HomeFragment extends Fragment{
     protected TextView where;
     protected TextView when;
     protected TextView name;
-    protected TextView right;
+    protected TextView right, status;
     private CardView suggestion,process;
     private int stateForTrement;
     Handler handle;
     Runnable runable;
+    private FragmentActivity mFrgAct;
+    private Intent mIntent;
 
     SwipeRefreshLayout swipeRefreshLayout;
 
@@ -59,6 +66,7 @@ public class HomeFragment extends Fragment{
         doing = root.findViewById(R.id.proDoing);
         date = root.findViewById(R.id.apDate);
         process = root.findViewById(R.id.processLayer);
+        status = root.findViewById(R.id.statusHome);
         View settingCV = root.findViewById(R.id.settingCV);
        settingCV.setOnClickListener(new View.OnClickListener() {
            @Override
@@ -75,12 +83,6 @@ public class HomeFragment extends Fragment{
             }
         });
 
-        process.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((MainMenuActivity)getActivity()).setViewPager(3);
-            }
-        });
         swipeRefreshLayout = (SwipeRefreshLayout) root.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -94,10 +96,11 @@ public class HomeFragment extends Fragment{
 
                         swipeRefreshLayout.setRefreshing(false);
                         ((MainMenuActivity)getActivity()).checkAppointment();
-                        Log.d("0000000000000000000",""+MainMenuActivity.getQueueNo());
                         if(MainMenuActivity.getQueueNo() != 0){
-                            ((MainMenuActivity)getActivity()).checkProcess();
                             ((MainMenuActivity)getActivity()).checkStatusInProccess();
+                            ((MainMenuActivity)getActivity()).checkQueue();
+                            ((MainMenuActivity)getActivity()).checkProcess();
+                            onStart();
                         }
 
                         handle.removeCallbacks(runable); // stop runable.
@@ -119,17 +122,22 @@ public class HomeFragment extends Fragment{
         if(place == null){
             place = "-";
         }
+
         when.setText(String.valueOf(remain));
         where.setText(place);
         doing.setText(state);
-
     }
 
     protected void updateQueue(int tempInt){
         queue.setText(String.valueOf(tempInt));
     }
 
+    protected void updateStatus(String statusQueue){
+        status.setText(statusQueue);
+    }
+
     protected void setAppointment(String tempDate){
+        Log.d("aaaaaaaaaaaaaaa",tempDate+"    "+date.toString());
         date.setText(tempDate);
     }
 
@@ -141,7 +149,14 @@ public class HomeFragment extends Fragment{
     @Override
     public void onStart() {
         super.onStart();
-        updateQueue(MainMenuActivity.getQueueNo());
-        changeState(MainMenuActivity.getState(), MainMenuActivity.getTargetLocation(), MainMenuActivity.getRemainQueue());
+        Patient patient = ((MainMenuActivity)getActivity()).getPatient();
+        setAppointment(patient.getAppointment());
+        setTime(patient.getTimeStart(),patient.getTimeEnd());
+        updateQueue(((MainMenuActivity)getActivity()).getQueueNo());
+        changeState(((MainMenuActivity)getActivity()).getState(),((MainMenuActivity)getActivity()).getTargetLocation(),((MainMenuActivity)getActivity()).getRemainQueue());
+        updateStatus(((MainMenuActivity)getActivity()).getStatusQueue());
+
+
     }
+
 }

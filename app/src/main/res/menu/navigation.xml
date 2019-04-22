@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item   android:title= "Home"
+    <item
         android:id="@+id/action_home"
         android:icon="@drawable/icons8_home_page_100"
-        />
+        android:title="หน้าหลัก" />
 
-    <item   android:title= "Notification"
+    <item
         android:id="@+id/action_notification"
         android:icon="@drawable/icons8_notification_100"
-        />
+        android:title="แจ้งเตือน" />
+
+    <item
+        android:id="@+id/action_workflow"
+        android:icon="@drawable/workflow"
+        android:title="กระบวนการทั้งหมด" />
+
 
 
 
