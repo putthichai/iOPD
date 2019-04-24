@@ -55,8 +55,12 @@ public class Patient {
         Date current = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
         String formattedDate = df.format(current);
-        if(appointment.equals(formattedDate)){
-            return true;
+        try{
+            if(appointment.equals(formattedDate)){
+                return true;
+            }
+        }catch(NullPointerException e){
+            return false;
         }
         return false;
     }
