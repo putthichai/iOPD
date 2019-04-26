@@ -196,7 +196,9 @@ public class CallApi extends AsyncTask<String, Void, JSONObject> {
         Log.d("cccccccccccccccc","bbbbbbb End CallApi function "+function);
        if(function == "getRoomScheduleByEmployeeId"){
            try {
-               mCallback.getIdRoom(object.getJSONObject("results").getInt("roomId"));
+               if(object != null){
+                   mCallback.getIdRoom(object.getJSONObject("results").getInt("roomId"));
+               }
            } catch (JSONException e) {
                e.printStackTrace();
            }finally {

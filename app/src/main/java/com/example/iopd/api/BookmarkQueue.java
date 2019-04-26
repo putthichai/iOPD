@@ -3,6 +3,7 @@ package com.example.iopd.api;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.example.iopd.activity.iOPD;
 
@@ -15,6 +16,8 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+
+import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class BookmarkQueue extends AsyncTask<String, Void, JSONObject> {
 
@@ -34,7 +37,7 @@ public class BookmarkQueue extends AsyncTask<String, Void, JSONObject> {
     @Override
     protected JSONObject doInBackground(String... strings) {
         try {
-            //Log.d(TAG,"222222222   roomId "+roomId+" appoint "+appointmentId);
+            Log.d(TAG,"222222222   roomId "+roomId+" appoint "+appointmentId+"    patient "+patientId+"  workflow"+workflowId);
 
             if(roomId == 0 || appointmentId == 0) return null;
 
@@ -104,6 +107,7 @@ public class BookmarkQueue extends AsyncTask<String, Void, JSONObject> {
     @Override
     protected void onPostExecute(JSONObject object) {
         try {
+            Log.d("cccccccccccccccccccccccccc","bookmark queue "+object);
             mCallback.bookmarkFinish(object.getJSONObject("results").getInt("queueNo"));
         } catch (JSONException e) {
             e.printStackTrace();
