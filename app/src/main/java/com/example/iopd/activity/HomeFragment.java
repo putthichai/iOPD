@@ -97,14 +97,10 @@ public class HomeFragment extends Fragment{
                         swipeRefreshLayout.setRefreshing(false);
                         ((MainMenuActivity)getActivity()).checkAppointment();
                         if(MainMenuActivity.getQueueNo() != 0){
-                            ((MainMenuActivity)getActivity()).checkAppointment();
-                            boolean temp =((MainMenuActivity)getActivity()).checkStatusInProccess();
-                            if(temp == true){
-                                ((MainMenuActivity)getActivity()).checkQueue();
-                                ((MainMenuActivity)getActivity()).checkProcess();
-                            }
-
-                            reloadValur();
+                            ((MainMenuActivity)getActivity()).checkStatusInProccess();
+                            ((MainMenuActivity)getActivity()).checkQueue();
+                            ((MainMenuActivity)getActivity()).checkProcess();
+                            onStart();
                         }
 
                         handle.removeCallbacks(runable); // stop runable.
@@ -141,6 +137,7 @@ public class HomeFragment extends Fragment{
     }
 
     protected void setAppointment(String tempDate){
+        Log.d("aaaaaaaaaaaaaaa",tempDate+"    "+date.toString());
         date.setText(tempDate);
     }
 
@@ -152,18 +149,14 @@ public class HomeFragment extends Fragment{
     @Override
     public void onStart() {
         super.onStart();
-       reloadValur();
-
-
-    }
-
-    protected void reloadValur(){
         Patient patient = ((MainMenuActivity)getActivity()).getPatient();
         setAppointment(patient.getAppointment());
         setTime(patient.getTimeStart(),patient.getTimeEnd());
         updateQueue(((MainMenuActivity)getActivity()).getQueueNo());
         changeState(((MainMenuActivity)getActivity()).getState(),((MainMenuActivity)getActivity()).getTargetLocation(),((MainMenuActivity)getActivity()).getRemainQueue());
         updateStatus(((MainMenuActivity)getActivity()).getStatusQueue());
+
+
     }
 
 }
