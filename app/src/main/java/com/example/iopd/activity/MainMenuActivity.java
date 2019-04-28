@@ -44,21 +44,14 @@ import com.example.iopd.app.QueueSession;
 import com.example.iopd.R;
 import com.example.iopd.app.SectionsStatePagerAdapter;
 import com.example.iopd.app.SessionManager;
-import com.example.iopd.service.MyFirebaseInstanceIDService;
 import com.example.iopd.service.SharedPrefManager;
 import com.example.iopd.utils.NotificationUtils;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalTime;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
@@ -98,7 +91,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             switch (item.getItemId()) {
                 case R.id.action_home:
                     setViewPager(0);
-                    showToken();
+                    //showToken();
                     return true;
                 case R.id.action_notification:
                     setViewPager(2);
@@ -157,21 +150,14 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                         message = intent.getStringExtra("message");
                         title = intent.getStringExtra("title");
 
+                        setViewPager(2);
+                        notification.setAdapterNotification(title,message);
                         if(queueNo != 0){
-                            setViewPager(2);
-                            notification.setAdapterNotification(title,message);
                             checkStatusInProccess();
                         }
-
                     }
                 }
             };
-
-            if(queueSession.isQueueNo()){
-            queueNo = queueSession.getQueueDetail();
-            }else {
-                queueNo = 0;
-            }
 
             HashMap<String, String> user = sessionManager.getUserDetail();
 
@@ -180,8 +166,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             String tempsur = user.get(sessionManager.SURNAME);
 
             patient = new Patient(tempid, tempFN, tempsur);
-
-
 
             //setup page
             mViewPage = findViewById(R.id.fragment);
@@ -200,15 +184,15 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
             bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-
-
             checkAppointment();
             checkQueue();
+            if(queueNo != 0){
+                checkProcess();
+            }
+            turnOnGPS();
+
         }
 
-        if(queueNo != 0){
-            checkProcess();
-        }
 
         //first request permission
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -220,10 +204,9 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+            turnOnGPS();
             return;
         }
-
-        turnOnGPS();
 
     }
     //check device token(debug)
@@ -304,6 +287,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                 JSONObject temp2 = temp.getJSONObject("results");
                 tempQueueNo = temp2.getInt("queueNo");
                 tempStatusQueue = temp2.getString("status_name");
+
             }else{
                 tempQueueNo = 0;
                 tempStatusQueue = "-";
@@ -323,8 +307,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         } finally {
                 this.queueNo = tempQueueNo;
                 statusQueue = tempStatusQueue;
-                //home.updateStatus(tempStatusQueue);
-               // home.updateQueue(this.queueNo);
         }
     }
 
@@ -366,6 +348,10 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         if(patient != null){
             if(patient.haveAppointment()){
                 new CallApi(patient.getDoctor(),MainMenuActivity.this).execute("getRoomScheduleByEmployeeId");
+            }else{
+                countLocation = 0;
+                StatusGPS = false;
+                turnOffGPS();
             }
         }
 
@@ -405,12 +391,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         return statusQueue;
     }
 
-
-    @Override
-    public void processFinish(JSONObject output) {
-
-
-    }
 
     @Override
     public void getIdRoom(final int idRoom) {
@@ -465,10 +445,10 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     @Override
     public void bookmarkFinish(int queueNo) {
         this.queueNo = queueNo;
-        queueSession.createSession(queueNo);
         home.updateQueue(queueNo);
         queue = true;
         checkProcess();
+        home.onStart();
 
     }
 
@@ -484,36 +464,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             Toast.makeText(getApplicationContext(),"Out of reach",Toast.LENGTH_SHORT).show();
             countLocation = 0;
         }
-    }
-
-    @Override
-    public void loadProcess(JSONObject object) {
-        /*try {
-            if(object != null){
-                Log.d("aaaaaaaaaaa",object.toString());
-                if(object.getInt("status") == 200){
-                    if(currentPage == 0){
-                        stateDoing = object.getJSONObject("results").getString("step");
-                        targetLocation = object.getJSONObject("results").getString("targetPlace");
-                        remainQueue = object.getJSONObject("results").getInt("remainQueue");
-                        home.changeState(stateDoing,targetLocation,remainQueue);
-                    }
-                    else if(currentPage == 1){
-                        place.setRemainQueue(object.getJSONObject("results").getInt("remainQueue"));
-                    }
-                }
-                else {
-                    statusQueue = "-";
-                    stateDoing = "-";
-                    targetLocation = "-";
-                    remainQueue = 0;
-                    home.onStart();
-                }
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }*/
     }
 
     @Override
@@ -576,13 +526,21 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
     public void checkProcess(){
         JSONObject temp = null;
+        int tempstatus = 400;
         try {
             temp = new ProcessApi(queueNo,patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=getStep").get();
             if(temp != null){
                 Log.d("aaaaaaaaaaaaaa",temp.toString());
-                stateDoing = temp.getJSONObject("results").getString("step");
-                targetLocation = temp.getJSONObject("results").getString("targetPlace");
-                remainQueue = temp.getJSONObject("results").getInt("remainQueue");
+                tempstatus = temp.getInt("status");
+                if(tempstatus == 200){
+                    stateDoing = temp.getJSONObject("results").getString("step");
+                    targetLocation = temp.getJSONObject("results").getString("targetPlace");
+                    remainQueue = temp.getJSONObject("results").getInt("remainQueue");
+                }
+            }else{
+                stateDoing = "-";
+                targetLocation = "-";
+                remainQueue = 0;
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -599,6 +557,8 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             stateDoing = "";
             targetLocation = "";
             remainQueue = 0;
+        }finally {
+
         }
     }
 
@@ -624,7 +584,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                //Log.d("cccccccccccccccc","bbbbbbb in onLocationChanged function");
+                Log.d("cccccccccccccccc","bbbbbbb in onLocationChanged function");
                 if(countLocation == 0 && queueNo == 0 && isInternetConnection()){
                     //Log.d("cccccccccccccccc","bbbbbbb start to check in area");
                     new CallApi(location.getLatitude(),location.getLongitude(),MainMenuActivity.this).execute("CheckInArea");
@@ -697,7 +657,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         }finally {
             Log.d("aaaaaaaaaaaaaaaaaa","status "+tempStatus);
             if(temp != null && tempStatus == 200){
-                Log.d("aaaaaaaaaaaaaaa",date+"     "+patient.toString()+"       "+home);
                 right.setText(processName);
             }
 
@@ -705,16 +664,14 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     }
 
     public void finishProcess(){
-            turnOffGPS();
-            checkAppointment();
+        turnOffGPS();
+        checkAppointment();
         queueNo = 0;
-        home.updateQueue(queueNo);
-        queueSession.clearSession();
         queue = false;
         stateDoing = "";
         targetLocation = "";
         remainQueue = 0;
-        home.changeState("-","-",0);
+        home.onReload();
     }
 
     public void checkStatusInProccess(){
@@ -771,10 +728,10 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         //if token is not null
         if (token != null) {
             //displaying the token
-            Log.d("555555555555555555555",token);
+            Log.d(TAG,token);
         } else {
             //if token is null that means something wrong
-            Log.d("555555555555555555555","Token not generated");
+            Log.d(TAG,"Token not generated");
         }
 
     }

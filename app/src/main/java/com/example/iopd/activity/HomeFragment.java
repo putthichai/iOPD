@@ -100,7 +100,7 @@ public class HomeFragment extends Fragment{
                             ((MainMenuActivity)getActivity()).checkStatusInProccess();
                             ((MainMenuActivity)getActivity()).checkQueue();
                             ((MainMenuActivity)getActivity()).checkProcess();
-                            onStart();
+                            onReload();
                         }
 
                         handle.removeCallbacks(runable); // stop runable.
@@ -149,14 +149,18 @@ public class HomeFragment extends Fragment{
     @Override
     public void onStart() {
         super.onStart();
+        onReload();
+
+    }
+
+    protected  void onReload(){
         Patient patient = ((MainMenuActivity)getActivity()).getPatient();
+        Log.d("aaaaaaaaaaaaaaaaaaaaaa",patient.toString());
         setAppointment(patient.getAppointment());
         setTime(patient.getTimeStart(),patient.getTimeEnd());
         updateQueue(((MainMenuActivity)getActivity()).getQueueNo());
         changeState(((MainMenuActivity)getActivity()).getState(),((MainMenuActivity)getActivity()).getTargetLocation(),((MainMenuActivity)getActivity()).getRemainQueue());
         updateStatus(((MainMenuActivity)getActivity()).getStatusQueue());
-
-
     }
 
 }

@@ -70,5 +70,14 @@ public class SettingFragment extends Fragment {
         gps.setChecked(b);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        onReload();
+    }
 
+    protected void onReload(){
+        boolean statusGPS =((MainMenuActivity)getActivity()).getStatusGPS();
+        gps.setChecked(statusGPS);
+    }
 }
