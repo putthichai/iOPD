@@ -6,9 +6,6 @@ import org.json.JSONObject;
 
 public interface iOPD {
 
-
-    void getIdRoom(int idroom);
-
     void bookmarkFinish(int queueNo);
 
     void checkIn(Boolean statue);

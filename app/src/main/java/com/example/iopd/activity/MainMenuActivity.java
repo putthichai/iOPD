@@ -347,7 +347,44 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     protected void bookmarkQueue(){
         if(patient != null){
             if(patient.haveAppointment()){
-                new CallApi(patient.getDoctor(),MainMenuActivity.this).execute("getRoomScheduleByEmployeeId");
+                LocalTime currenttime = LocalTime.now();
+                String[] tempStart = patient.getTimeStart().split(":");
+                int tempHourStart = Integer.parseInt(tempStart[0]);
+                int tempMinStart = Integer.parseInt(tempStart[1]);
+                int tempSecStart = Integer.parseInt(tempStart[2]);
+                String[] tempEnd = patient.getTimeEnd().split(":");
+                int tempHourEnd = Integer.parseInt(tempEnd[0]);
+                int tempMinEnd = Integer.parseInt(tempEnd[1]);
+                int tempSecend = Integer.parseInt(tempEnd[2]);
+                LocalTime timeStar = LocalTime.of(tempHourStart,tempMinStart,tempSecStart);
+                LocalTime timeEnd = LocalTime.of(tempHourEnd,tempMinEnd,tempSecend);
+                if(currenttime.isAfter(timeStar) && currenttime.isBefore(timeEnd)){
+                    if(tempconut == 0){
+                        tempconut++;
+                        AlertDialog.Builder builder =
+                                new AlertDialog.Builder(MainMenuActivity.this);
+                        builder.setMessage("คุณต้องการจองคิวมั้ยคะ?");
+                        builder.setPositiveButton("ตกลง", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                new BookmarkQueue(patient.getId(),patient.getRoomId(),patient.getAppointmentId(),patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=addQueue");
+                                Toast.makeText(getApplicationContext(), "คุณทำการจองคิวสำเร็จ", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        builder.setNegativeButton("ยกเลิก", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                turnOffGPS();
+                                StatusGPS = false;
+                                countLocation = 0;
+                                tempconut = 0;
+                            }
+                        });
+                        builder.show();
+                    }
+                }else{
+                    Toast.makeText(getApplicationContext(),"Please booking in the appointment time", Toast.LENGTH_LONG).show();
+                }
+
             }else{
                 countLocation = 0;
                 StatusGPS = false;
@@ -387,51 +424,9 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     protected static Patient getPatient(){
         return patient;
     }
+
     protected String getStatusQueue(){
         return statusQueue;
-    }
-
-
-    @Override
-    public void getIdRoom(final int idRoom) {
-        LocalTime currenttime = LocalTime.now();
-        String[] tempStart = patient.getTimeStart().split(":");
-        int tempHourStart = Integer.parseInt(tempStart[0]);
-        int tempMinStart = Integer.parseInt(tempStart[1]);
-        int tempSecStart = Integer.parseInt(tempStart[2]);
-        String[] tempEnd = patient.getTimeEnd().split(":");
-        int tempHourEnd = Integer.parseInt(tempEnd[0]);
-        int tempMinEnd = Integer.parseInt(tempEnd[1]);
-        int tempSecend = Integer.parseInt(tempEnd[2]);
-        LocalTime timeStar = LocalTime.of(tempHourStart,tempMinStart,tempSecStart);
-        LocalTime timeEnd = LocalTime.of(tempHourEnd,tempMinEnd,tempSecend);
-        if(currenttime.isAfter(timeStar) && currenttime.isBefore(timeEnd)){
-            if(tempconut == 0){
-                AlertDialog.Builder builder =
-                        new AlertDialog.Builder(MainMenuActivity.this);
-                builder.setMessage("คุณต้องการจองคิวมั้ยคะ?");
-                builder.setPositiveButton("ตกลง", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        new BookmarkQueue(patient.getId(),idRoom,patient.getAppointmentId(),patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=addQueue");
-                        Toast.makeText(getApplicationContext(), "คุณมีนัดใช่มั้ย", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                builder.setNegativeButton("ยกเลิก", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        turnOffGPS();
-                        StatusGPS = false;
-                        countLocation = 0;
-                        tempconut = 0;
-                    }
-                });
-                builder.show();
-                tempconut++;
-            }
-        }else{
-            Toast.makeText(getApplicationContext(),"Please booking in the appointment time", Toast.LENGTH_LONG).show();
-        }
-
     }
 
     protected void setStatusGPS(boolean b){
@@ -645,6 +640,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                 patient.setAppointment(temp.getJSONObject("results").getInt("employeeId"),temp.getJSONObject("results").getInt("id"));
                 patient.setTime(temp.getJSONObject("results").getString("timeslot_starttime"),temp.getJSONObject("results").getString("timeslot_endtime"));
                 patient.setWorkflowId(temp.getJSONObject("results").getInt("workflowId"));
+                patient.setRoomId(temp.getJSONObject("results").getInt("room_id"));
                 processName = temp.getString("process");
 
             }

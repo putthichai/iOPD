@@ -12,12 +12,14 @@ public class Patient {
     private int queueNo;
     private String appointment,timeStart,timeEnd;
     private int doctor, appointmentId,workflowId;
+    private int roomId;
 
     public Patient(int mId, String mName, String mSurname){
         id = mId;
         name = mName;
         surname = mSurname;
         workflowId = 0;
+        roomId = 0;
         appointment = "";
         timeStart = "";
         timeEnd = "";
@@ -97,5 +99,11 @@ public class Patient {
 
     public int getAppointmentId(){
         return appointmentId;
+    }
+
+    public int getRoomId(){return roomId;}
+
+    public void setRoomId(int room){
+        roomId = room;
     }
 }
