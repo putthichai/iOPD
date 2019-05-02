@@ -287,6 +287,10 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                 JSONObject temp2 = temp.getJSONObject("results");
                 tempQueueNo = temp2.getInt("queueNo");
                 tempStatusQueue = temp2.getString("status_name");
+                int tempFinsih = temp2.getInt("statusId");
+                if(tempFinsih == 5){
+                    tempconut = 1;
+                }
 
             }else{
                 tempQueueNo = 0;
@@ -359,6 +363,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                 LocalTime timeStar = LocalTime.of(tempHourStart,tempMinStart,tempSecStart);
                 LocalTime timeEnd = LocalTime.of(tempHourEnd,tempMinEnd,tempSecend);
                 if(currenttime.isAfter(timeStar) && currenttime.isBefore(timeEnd)){
+                    checkQueue();
                     if(tempconut == 0){
                         tempconut++;
                         AlertDialog.Builder builder =
