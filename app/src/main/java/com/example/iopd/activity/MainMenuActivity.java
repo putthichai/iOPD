@@ -242,7 +242,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             checkAppointment();
             checkQueue();
             checkProcess();
-            home.onStart();
+            home.onReload();
         }else if(page == 1){
             currentPage = 1;
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
@@ -282,6 +282,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         String tempStatusQueue = "";
         try {
             temp = new getQueue(patient.getId(),patient.getWorkflowId()).execute("https://iopdapi.ml/?function=getQueueByPatientId").get();
+            Log.d("xxxxxxxxxxxxx",temp.toString());
             tempStatus = temp.getInt("status");
             if(tempStatus == 200){
                 JSONObject temp2 = temp.getJSONObject("results");
@@ -290,6 +291,12 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                 int tempFinsih = temp2.getInt("statusId");
                 if(tempFinsih == 5){
                     tempconut = 1;
+                    tempQueueNo = 0;
+                    queue = false;
+                    stateDoing = "-";
+                    targetLocation = "-";
+                    remainQueue = 0;
+                    tempStatusQueue = "-";
                 }
 
             }else{
@@ -448,7 +455,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         home.updateQueue(queueNo);
         queue = true;
         checkProcess();
-        home.onStart();
+        home.onReload();
 
     }
 
@@ -619,9 +626,11 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         if(currentPage == 5){
             settingFragment.checkStatusGPS(false);
         }
+        if(locationListener != null && locationManager != null){
+            locationManager.removeUpdates(locationListener);
+            locationManager = null;
+        }
 
-        locationManager.removeUpdates(locationListener);
-        locationManager = null;
     }
 
     public void callAllProcess(){
@@ -636,18 +645,19 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         String processName = "";
         try {
             temp = new AppointmentApi(MainMenuActivity.this,patient.getId()).execute("https://iopdapi.ml/?function=getAppointmentByPatientsId").get();
-            Log.d("aaaaaaaaaaaaaa",temp.toString());
-            tempStatus = temp.getInt("status");
-            if(tempStatus == 200){
-                String[] tempDate = temp.getJSONObject("results").getString("date").split("-");
-                date = tempDate[2]+"-"+tempDate[1]+"-"+tempDate[0];
-                patient.setAppointmentDate(date);
-                patient.setAppointment(temp.getJSONObject("results").getInt("employeeId"),temp.getJSONObject("results").getInt("id"));
-                patient.setTime(temp.getJSONObject("results").getString("timeslot_starttime"),temp.getJSONObject("results").getString("timeslot_endtime"));
-                patient.setWorkflowId(temp.getJSONObject("results").getInt("workflowId"));
-                patient.setRoomId(temp.getJSONObject("results").getInt("room_id"));
-                processName = temp.getString("process");
-
+            if(temp != null){
+                Log.d("aaaaaaaaaaaaaa",temp.toString());
+                tempStatus = temp.getInt("status");
+                if(tempStatus == 200){
+                    String[] tempDate = temp.getJSONObject("results").getString("date").split("-");
+                    date = tempDate[2]+"-"+tempDate[1]+"-"+tempDate[0];
+                    patient.setAppointmentDate(date);
+                    patient.setAppointment(temp.getJSONObject("results").getInt("employeeId"),temp.getJSONObject("results").getInt("id"));
+                    patient.setTime(temp.getJSONObject("results").getString("timeslot_starttime"),temp.getJSONObject("results").getString("timeslot_endtime"));
+                    patient.setWorkflowId(temp.getJSONObject("results").getInt("workflowId"));
+                    patient.setRoomId(temp.getJSONObject("results").getInt("room_id"));
+                    processName = temp.getString("process");
+                }
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -669,10 +679,13 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         checkAppointment();
         queueNo = 0;
         queue = false;
-        stateDoing = "";
-        targetLocation = "";
+        stateDoing = "-";
+        targetLocation = "-";
         remainQueue = 0;
-        home.onReload();
+        if(currentPage == 0){
+            home.onReload();
+        }
+
     }
 
     public void checkStatusInProccess(){

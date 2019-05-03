@@ -106,7 +106,7 @@ public class HomeFragment extends Fragment{
                         handle.removeCallbacks(runable); // stop runable.
                     }
                 };
-                handle.postDelayed(runable, 3000); // delay 3 s.
+                handle.postDelayed(runable, 5000); // delay 3 s.
             }
         });
 
