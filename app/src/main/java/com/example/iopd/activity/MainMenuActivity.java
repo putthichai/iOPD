@@ -91,8 +91,8 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
             switch (item.getItemId()) {
                 case R.id.action_home:
-                    setViewPager(0);
                     countHome++;
+                    setViewPager(0);
                     //showToken();
                     return true;
                 case R.id.action_notification:
@@ -237,7 +237,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
     //change page
     public void setViewPager(int page){
-        if(page == 0){
+        if(page == 0 && countHome <= 1){
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(home,"Home");
             currentPage = 0;
