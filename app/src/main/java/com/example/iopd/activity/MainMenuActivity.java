@@ -80,6 +80,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     QueueSession queueSession;
     private BroadcastReceiver mRegistrationBroadcastReceiver;
     private String message,title,token;
+    private int countHome;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -91,6 +92,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             switch (item.getItemId()) {
                 case R.id.action_home:
                     setViewPager(0);
+                    countHome++;
                     //showToken();
                     return true;
                 case R.id.action_notification:
@@ -125,6 +127,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             backButtonCount =0;
             currentPage =0;
             tempconut =0;
+            countHome = 0;
             countLocation =0;
             stateDoing = "";
             targetLocation = "";
@@ -243,6 +246,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             checkQueue();
             checkProcess();
             home.onReload();
+            countHome = 0;
         }else if(page == 1){
             currentPage = 1;
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
