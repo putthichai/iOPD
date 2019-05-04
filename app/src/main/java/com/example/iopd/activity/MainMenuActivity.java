@@ -455,7 +455,9 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         home.updateQueue(queueNo);
         queue = true;
         checkProcess();
-        home.onReload();
+        if(currentPage == 0){
+            home.onReload();
+        }
 
     }
 
