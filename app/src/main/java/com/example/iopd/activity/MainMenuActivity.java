@@ -91,7 +91,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
             switch (item.getItemId()) {
                 case R.id.action_home:
-                    countHome++;
                     setViewPager(0);
                     //showToken();
                     return true;
@@ -237,7 +236,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
     //change page
     public void setViewPager(int page){
-        if(page == 0 && countHome <= 1){
+        if(page == 0 && countHome == 0){
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(home,"Home");
             currentPage = 0;
@@ -246,36 +245,41 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             checkQueue();
             checkProcess();
             home.onReload();
-            countHome = 0;
+            countHome++;
         }else if(page == 1){
-            currentPage = 1;
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(place,"Suggestion location");
+            currentPage = 1;
             mViewPage.setAdapter(adapter);
             checkProcess();
+            countHome = 0;
         }else if(page == 2){
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(notification,"Notification");
             mViewPage.setAdapter(adapter);
             currentPage =2;
+            countHome = 0;
         }else if(page == 3){
             currentPage = 3;
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(process,"Progress");
             mViewPage.setAdapter(adapter);
             callAllProcess();
+            countHome = 0;
         }else if(page == 4){
             //mViewPage.removeAllViews();
             //SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             //adapter.addFragment(new Place2Fragment(),"Progress");
             //mViewPage.setAdapter(adapter);
             //currentPage = 4;
+            countHome = 0;
         }else if(page == 5){
             currentPage = 5;
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
             adapter.addFragment(settingFragment,"Setting");
             mViewPage.setAdapter(adapter);
             settingFragment.checkStatusGPS(StatusGPS);
+            countHome = 0;
         }
     }
 
@@ -763,8 +767,9 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         return connectivityManager.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 
-
-
+    protected  void resetCountHome(){
+        countHome = 0;
+    }
 
 
 

@@ -161,6 +161,7 @@ public class HomeFragment extends Fragment{
         updateQueue(((MainMenuActivity)getActivity()).getQueueNo());
         changeState(((MainMenuActivity)getActivity()).getState(),((MainMenuActivity)getActivity()).getTargetLocation(),((MainMenuActivity)getActivity()).getRemainQueue());
         updateStatus(((MainMenuActivity)getActivity()).getStatusQueue());
+        ((MainMenuActivity)getActivity()).resetCountHome();
     }
 
 }
