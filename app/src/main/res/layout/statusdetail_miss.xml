@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/statusProcess"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/icons8_filled_circle_miss" />
+
+    <ImageView
+        android:id="@+id/nextProcess"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        app:layout_constraintStart_toStartOf="@+id/statusProcess"
+        app:layout_constraintTop_toBottomOf="@+id/statusProcess"
+        app:srcCompat="@drawable/icons8_thick_arrow_pointing_down_miss" />
+
+    <TextView
+        android:id="@+id/TLname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="TextView"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/nextProcess"
+        app:layout_constraintStart_toEndOf="@+id/statusProcess"
+        app:layout_constraintTop_toTopOf="@+id/statusProcess" />
+
+</android.support.constraint.ConstraintLayout>

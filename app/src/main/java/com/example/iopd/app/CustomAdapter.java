@@ -57,12 +57,22 @@ public class CustomAdapter extends BaseAdapter {
                 TextView textView = (TextView)convertView.findViewById(R.id.TLname);
                 textView.setText(processName[position]);
             }
+            else if(order[position] == 2 && position == order.length -1){
+            convertView = mInflater.inflate(R.layout.statusdetail_last_miss, parent, false);
+            TextView textView = (TextView)convertView.findViewById(R.id.TLname);
+            textView.setText(processName[position]);
+            }
             else if(order[position] == 1){
                 convertView = mInflater.inflate(R.layout.statusdetail_in, parent, false);
                 TextView textView = (TextView)convertView.findViewById(R.id.TLname);
                 textView.setText(processName[position]);
             }else if(order[position] == 0){
                 convertView = mInflater.inflate(R.layout.statusdetail_out, parent, false);
+                TextView textView = (TextView)convertView.findViewById(R.id.TLname);
+                textView.setText(processName[position]);
+            }
+            else if(order[position] == 2){
+                convertView = mInflater.inflate(R.layout.statusdetail_miss, parent, false);
                 TextView textView = (TextView)convertView.findViewById(R.id.TLname);
                 textView.setText(processName[position]);
             }
