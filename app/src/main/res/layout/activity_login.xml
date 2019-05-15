@@ -93,6 +93,7 @@
         android:layout_marginEnd="8dp"
         android:background="@color/login_button"
         android:text="Register"
+        android:visibility="gone"
         app:layout_constraintEnd_toStartOf="@+id/reset"
         app:layout_constraintStart_toEndOf="@+id/confirm"
         app:layout_constraintTop_toTopOf="@+id/confirm" />

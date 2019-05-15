@@ -151,7 +151,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                         // new push notification is received
                         message = intent.getStringExtra("message");
                         title = intent.getStringExtra("title");
-
                         setViewPager(2);
                         notification.setAdapterNotification(title,message);
                         if(queueNo != 0){
@@ -489,10 +488,12 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
                 if(jsonObject.getInt("status") == 200){
                     int tempNum = jsonObject.getJSONArray("results").length();
+                    Log.d("cccccccccc",jsonObject.toString());
                     String[] name = new String[tempNum];
                     int[] id = new int[tempNum];
                     for(int i=0; i<tempNum;i++){
                         JSONObject temp = jsonObject.getJSONArray("results").getJSONObject(i);
+                        Log.d("ppppp "+i,temp.toString());
                         name[i] = temp.getString("name");
                         id[i] = jsonObject.getJSONArray("state").getInt(i);
                     }

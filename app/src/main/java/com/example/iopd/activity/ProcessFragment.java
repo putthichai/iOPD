@@ -3,6 +3,7 @@ package com.example.iopd.activity;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +20,7 @@ public class ProcessFragment extends Fragment {
 
     private ListView listView;
     private  View root;
-    private CustomAdapter adapter;
+
 
 
     public ProcessFragment() {
@@ -33,18 +34,14 @@ public class ProcessFragment extends Fragment {
         // Inflate the layout for this fragment
         root = inflater.inflate(R.layout.fragment_process, container, false);
         listView = root.findViewById(R.id.processList);
-
-
         return root;
     }
 
     protected void setProcess(String[] process,int[] order){
-        adapter = new CustomAdapter(root.getContext(), process, order);
+        Log.d("oooooaaaaa",""+process.length+"     "+order.length);
+        CustomAdapter adapter = new CustomAdapter(root.getContext(), process, order);
         listView.setAdapter(adapter);
-    }
-
-    protected void passProcess(int step){
-        adapter.passProcess(step);
+        adapter = null;
     }
 
 }
