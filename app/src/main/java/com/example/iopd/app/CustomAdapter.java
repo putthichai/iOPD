@@ -1,6 +1,7 @@
 package com.example.iopd.app;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,7 @@ public class CustomAdapter extends BaseAdapter {
         LayoutInflater mInflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         if(convertView == null){
+            Log.d("oooooooo",""+position);
             if(order[position] == 0 && position == order.length -1){
                 convertView = mInflater.inflate(R.layout.statusdetail_last_out, parent, false);
                 TextView textView = (TextView)convertView.findViewById(R.id.TLname);
@@ -58,16 +60,17 @@ public class CustomAdapter extends BaseAdapter {
                 textView.setText(processName[position]);
             }
             else if(order[position] == 2 && position == order.length -1){
-            convertView = mInflater.inflate(R.layout.statusdetail_last_miss, parent, false);
-            TextView textView = (TextView)convertView.findViewById(R.id.TLname);
-            textView.setText(processName[position]);
+                convertView = mInflater.inflate(R.layout.statusdetail_last_miss, parent, false);
+                TextView textView = (TextView)convertView.findViewById(R.id.TLname);
+                textView.setText(processName[position]);
+            }
+            else if(order[position] == 0){
+                convertView = mInflater.inflate(R.layout.statusdetail_out, parent, false);
+                TextView textView = (TextView)convertView.findViewById(R.id.TLname);
+                textView.setText(processName[position]);
             }
             else if(order[position] == 1){
                 convertView = mInflater.inflate(R.layout.statusdetail_in, parent, false);
-                TextView textView = (TextView)convertView.findViewById(R.id.TLname);
-                textView.setText(processName[position]);
-            }else if(order[position] == 0){
-                convertView = mInflater.inflate(R.layout.statusdetail_out, parent, false);
                 TextView textView = (TextView)convertView.findViewById(R.id.TLname);
                 textView.setText(processName[position]);
             }
