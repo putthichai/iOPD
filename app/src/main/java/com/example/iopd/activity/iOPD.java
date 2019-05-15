@@ -10,6 +10,5 @@ public interface iOPD {
 
     void checkIn(Boolean statue);
 
-    void loadAllprocess(JSONObject jsonObject);
 
 }

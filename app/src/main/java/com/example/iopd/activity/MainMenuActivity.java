@@ -81,6 +81,8 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     private BroadcastReceiver mRegistrationBroadcastReceiver;
     private String message,title,token;
     private int countHome;
+    private String[] allprocessName;
+    private int[] allproessStatus;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -95,6 +97,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                     //showToken();
                     return true;
                 case R.id.action_workflow:
+                    callAllProcess();
                     setViewPager(3);
                     return true;
             }
@@ -497,33 +500,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         }
     }
 
-    @Override
-    public void loadAllprocess(JSONObject jsonObject) {
-            try {
-
-                if(jsonObject.getInt("status") == 200){
-                    int tempNum = jsonObject.getJSONArray("results").length();
-                    Log.d("cccccccccc",jsonObject.toString());
-                    String[] name = new String[tempNum];
-                    int[] id = new int[tempNum];
-                    for(int i=0; i<tempNum;i++){
-                        JSONObject temp = jsonObject.getJSONArray("results").getJSONObject(i);
-                        Log.d("ppppp "+i,temp.toString());
-                        name[i] = temp.getString("name");
-                        id[i] = jsonObject.getJSONArray("state").getInt(i);
-                    }
-                    process.setProcess(name,id);
-                }
-
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-
-        //process.setProcess();
-    }
-
     private boolean haveNetwork(){
         boolean have_WIFI = false;
         boolean have_MOBILEDATA = false;
@@ -660,8 +636,36 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     }
 
     public void callAllProcess(){
-       if(isInternetConnection())
-        new AllProcessesApi(queueNo,patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=checkStateInProcess");
+       if(isInternetConnection()) {
+           try {
+               JSONObject temp = new AllProcessesApi(queueNo, patient.getWorkflowId(), MainMenuActivity.this).execute("https://iopdapi.ml/?function=checkStateInProcess").get();
+               if (temp != null) {
+                   if (temp.getInt("status") == 200) {
+                       int tempNum = temp.getJSONArray("results").length();
+                       Log.d("cccccccccc", temp.toString());
+                       String[] name = new String[tempNum];
+                       int[] id = new int[tempNum];
+                       for (int i = 0; i < tempNum; i++) {
+                           JSONObject temp1 = temp.getJSONArray("results").getJSONObject(i);
+                           Log.d("ppppp " + i, temp1.toString());
+                           name[i] = temp1.getString("name");
+                           id[i] = temp.getJSONArray("state").getInt(i);
+                       }
+                       allprocessName = null;
+                       allproessStatus = null;
+                       allprocessName = name;
+                       allproessStatus = id;
+                   }
+               }
+           }catch(InterruptedException e){
+                   e.printStackTrace();
+           } catch(ExecutionException e){
+                   e.printStackTrace();
+           } catch(JSONException e){
+                   e.printStackTrace();
+           }
+
+       }
     }
 
     public void checkAppointment(){
@@ -785,6 +789,14 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
     protected  void resetCountHome(){
         countHome = 0;
+    }
+
+    public String[] getAllprocessName(){
+        return allprocessName;
+    }
+
+    public  int[] getAllproessStatus(){
+        return allproessStatus;
     }
 
 

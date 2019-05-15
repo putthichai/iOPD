@@ -4,8 +4,6 @@ package com.example.iopd.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -17,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.iopd.R;
-import com.example.iopd.activity.MainMenuActivity;
 import com.example.iopd.app.Patient;
 
 

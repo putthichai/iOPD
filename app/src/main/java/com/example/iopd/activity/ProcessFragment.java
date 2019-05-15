@@ -44,4 +44,10 @@ public class ProcessFragment extends Fragment {
         adapter = null;
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setProcess(((MainMenuActivity)getActivity()).getAllprocessName(),((MainMenuActivity)getActivity()).getAllproessStatus());
+    }
 }

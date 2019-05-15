@@ -88,10 +88,4 @@ public class AllProcessesApi extends AsyncTask<String, Integer, JSONObject> {
         return null;
     }
 
-    @Override
-    protected void onPostExecute(JSONObject jsonObject) {
-        mCallback.loadAllprocess(jsonObject);
-    }
-
-
 }
