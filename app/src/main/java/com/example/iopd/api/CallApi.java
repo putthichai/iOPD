@@ -161,8 +161,10 @@ public class CallApi extends AsyncTask<String, Void, JSONObject> {
         if (function == "CheckInArea") {
             Boolean temp = false;
             try {
-                if (object.getInt("result") == 1) {
-                    temp = true;
+                if(object != null){
+                    if (object.getInt("result") == 1) {
+                        temp = true;
+                    }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

@@ -167,6 +167,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                         checkAppointment();
                         checkQueue();
                         checkProcess();
+                        checkStatusInProccess();
                         if(currentPage == 0){
                             home.onReload();
                         }
@@ -307,27 +308,30 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         String tempStatusQueue = "";
         try {
             temp = new getQueue(patient.getId(),patient.getWorkflowId()).execute("https://iopdapi.ml/?function=getQueueByPatientId").get();
-            Log.d("xxxxxxxxxxxxx",temp.toString());
-            tempStatus = temp.getInt("status");
-            if(tempStatus == 200){
-                JSONObject temp2 = temp.getJSONObject("results");
-                tempQueueNo = temp2.getInt("queueNo");
-                tempStatusQueue = temp2.getString("status_name");
-                int tempFinsih = temp2.getInt("statusId");
-                if(tempFinsih == 5){
-                    tempconut = 1;
-                    tempQueueNo = 0;
-                    queue = false;
-                    stateDoing = "-";
-                    targetLocation = "-";
-                    remainQueue = 0;
-                    tempStatusQueue = "-";
-                }
+           if(temp != null){
+               Log.d("xxxxxxxxxxxxx",temp.toString());
+               tempStatus = temp.getInt("status");
+               if(tempStatus == 200){
+                   JSONObject temp2 = temp.getJSONObject("results");
+                   tempQueueNo = temp2.getInt("queueNo");
+                   tempStatusQueue = temp2.getString("status_name");
+                   int tempFinsih = temp2.getInt("statusId");
+                   if(tempFinsih == 5){
+                       tempconut = 1;
+                       tempQueueNo = 0;
+                       queue = false;
+                       stateDoing = "-";
+                       targetLocation = "-";
+                       remainQueue = 0;
+                       tempStatusQueue = "-";
+                   }
 
-            }else{
-                tempQueueNo = 0;
-                tempStatusQueue = "-";
-            }
+               }else{
+                   tempQueueNo = 0;
+                   tempStatusQueue = "-";
+               }
+           }
+
         } catch (InterruptedException e) {
             e.printStackTrace();
             tempQueueNo = 0;
@@ -642,12 +646,10 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                if (temp != null) {
                    if (temp.getInt("status") == 200) {
                        int tempNum = temp.getJSONArray("results").length();
-                       Log.d("cccccccccc", temp.toString());
                        String[] name = new String[tempNum];
                        int[] id = new int[tempNum];
                        for (int i = 0; i < tempNum; i++) {
                            JSONObject temp1 = temp.getJSONArray("results").getJSONObject(i);
-                           Log.d("ppppp " + i, temp1.toString());
                            name[i] = temp1.getString("name");
                            id[i] = temp.getJSONArray("state").getInt(i);
                        }

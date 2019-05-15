@@ -48,6 +48,7 @@ public class ProcessFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        if(((MainMenuActivity)getActivity()).getAllprocessName() != null && ((MainMenuActivity)getActivity()).getAllproessStatus() != null)
         setProcess(((MainMenuActivity)getActivity()).getAllprocessName(),((MainMenuActivity)getActivity()).getAllproessStatus());
     }
 }
