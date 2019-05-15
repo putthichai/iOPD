@@ -94,9 +94,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                     setViewPager(0);
                     //showToken();
                     return true;
-                case R.id.action_notification:
-                    setViewPager(2);
-                    return true;
                 case R.id.action_workflow:
                     setViewPager(3);
                     return true;

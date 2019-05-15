@@ -133,7 +133,11 @@ public class HomeFragment extends Fragment{
     }
 
     protected void updateStatus(String statusQueue){
-        status.setText(statusQueue);
+        if(statusQueue.equals("Meeting")) status.setText("กำลังดำเนิดการ");
+        else if(statusQueue.equals("Calling")) status.setText("กำลังเรียกคิว");
+        else if(statusQueue.equals("Waiting")) status.setText("กำลังรอ");
+        else if(statusQueue.equals("Delayed")) status.setText("คิวคุณหาย");
+
     }
 
     protected void setAppointment(String tempDate){

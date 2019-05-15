@@ -7,11 +7,6 @@
         android:title="หน้าหลัก" />
 
     <item
-        android:id="@+id/action_notification"
-        android:icon="@drawable/icons8_notification_100"
-        android:title="แจ้งเตือน" />
-
-    <item
         android:id="@+id/action_workflow"
         android:icon="@drawable/workflow"
         android:title="กระบวนการทั้งหมด" />
