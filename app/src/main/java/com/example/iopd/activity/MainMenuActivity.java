@@ -151,9 +151,27 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                         // new push notification is received
                         message = intent.getStringExtra("message");
                         title = intent.getStringExtra("title");
+                        if(title != ""){
+                            AlertDialog.Builder builder =
+                                    new AlertDialog.Builder(MainMenuActivity.this);
+                            builder.setMessage(message);
+                            builder.setTitle(title);
+                            builder.setNegativeButton("ปิด", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
 
-                        setViewPager(2);
-                        notification.setAdapterNotification(title,message);
+                                }
+                            });
+                            builder.show();
+                        }
+                        checkAppointment();
+                        checkQueue();
+                        checkProcess();
+                        if(currentPage == 0){
+                            home.onReload();
+                        }
+
+                        //notification.setAdapterNotification(title,message);
                         if(queueNo != 0){
                             checkStatusInProccess();
                         }
