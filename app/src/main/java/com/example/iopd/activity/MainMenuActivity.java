@@ -314,6 +314,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                if(tempStatus == 200){
                    JSONObject temp2 = temp.getJSONObject("results");
                    tempQueueNo = temp2.getInt("id");
+                   Log.d("qqqqqqqqqqqqqqqqqqq",""+tempQueueNo);
                    tempStatusQueue = temp2.getString("status_name");
                    int tempFinsih = temp2.getInt("statusId");
                    if(tempFinsih == 5){
