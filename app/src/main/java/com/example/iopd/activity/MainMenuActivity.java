@@ -164,17 +164,8 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                             });
                             builder.show();
                         }
-                        checkAppointment();
-                        checkQueue();
-                        checkProcess();
-                        checkStatusInProccess();
-                        if(currentPage == 0){
-                            home.onReload();
-                        }
+                        reload();
 
-                        if(queueNo != 0){
-                            checkStatusInProccess();
-                        }
                     }
                 }
             };
@@ -259,9 +250,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             adapter.addFragment(home,"Home");
             currentPage = 0;
             mViewPage.setAdapter(adapter);
-            checkAppointment();
-            checkQueue();
-            checkProcess();
+            reload();
             home.onReload();
             countHome++;
         }else if(page == 1){
@@ -484,11 +473,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         this.queueNo = queueNo;
         home.updateQueue(queueNo);
         queue = true;
-        checkProcess();
-        if(currentPage == 0){
-            home.onReload();
-        }
-
+        reload();
     }
 
     @Override
@@ -679,7 +664,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         try {
             temp = new AppointmentApi(MainMenuActivity.this,patient.getId()).execute("https://iopdapi.ml/?function=getAppointmentByPatientsId").get();
             if(temp != null){
-                Log.d("aaaaaaaaaaaaaa",temp.toString());
                 tempStatus = temp.getInt("status");
                 if(tempStatus == 200){
                     String[] tempDate = temp.getJSONObject("results").getString("date").split("-");
@@ -767,21 +751,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     public String getSubject(){
         return title;
     }
-
-    public void showToken(){
-
-        token = SharedPrefManager.getInstance(this).getDeviceToken();
-
-        //if token is not null
-        if (token != null) {
-            //displaying the token
-            Log.d(TAG,token);
-        } else {
-            //if token is null that means something wrong
-            Log.d(TAG,"Token not generated");
-        }
-
-    }
+    
 
     public  boolean isInternetConnection()
     {
@@ -800,6 +770,20 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
     public  int[] getAllproessStatus(){
         return allproessStatus;
+    }
+
+    public void reload(){
+        checkAppointment();
+        checkQueue();
+        checkProcess();
+        checkStatusInProccess();
+        if(currentPage == 0){
+            home.onReload();
+        }
+        if(queueNo != 0){
+            checkStatusInProccess();
+        }
+
     }
 
 

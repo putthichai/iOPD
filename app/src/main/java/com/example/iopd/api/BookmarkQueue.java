@@ -21,7 +21,6 @@ public class BookmarkQueue extends AsyncTask<String, Void, JSONObject> {
 
     private static  int patientId, roomId, appointmentId,workflowId;
 
-    private static int queueNo;
     private iOPD mCallback;
 
     public BookmarkQueue(int pId, int rId, int aId,int wId, Context context){
@@ -105,7 +104,7 @@ public class BookmarkQueue extends AsyncTask<String, Void, JSONObject> {
     @Override
     protected void onPostExecute(JSONObject object) {
         try {
-            mCallback.bookmarkFinish(object.getJSONObject("results").getInt("queueNo"));
+            mCallback.bookmarkFinish(object.getJSONObject("results").getInt("id"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
