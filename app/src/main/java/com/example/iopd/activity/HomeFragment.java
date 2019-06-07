@@ -93,6 +93,7 @@ public class HomeFragment extends Fragment{
 
                         swipeRefreshLayout.setRefreshing(false);
                         ((MainMenuActivity)getActivity()).checkAppointment();
+
                         if(MainMenuActivity.getQueueNo() != 0){
                             ((MainMenuActivity)getActivity()).checkStatusInProccess();
                             ((MainMenuActivity)getActivity()).checkQueue();
@@ -134,6 +135,9 @@ public class HomeFragment extends Fragment{
         else if(statusQueue.equals("Calling")) status.setText("กำลังเรียกคิว");
         else if(statusQueue.equals("Waiting")) status.setText("กำลังรอ");
         else if(statusQueue.equals("Delayed")) status.setText("คิวคุณหาย");
+        else {
+            status.setText("-");
+        }
 
     }
 

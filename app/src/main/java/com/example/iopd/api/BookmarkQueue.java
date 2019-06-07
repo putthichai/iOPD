@@ -3,6 +3,7 @@ package com.example.iopd.api;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.example.iopd.activity.MainMenuActivity;
 import com.example.iopd.activity.iOPD;
@@ -104,6 +105,7 @@ public class BookmarkQueue extends AsyncTask<String, Void, JSONObject> {
     @Override
     protected void onPostExecute(JSONObject object) {
         try {
+            Log.d("llllllllllll",""+object.getJSONObject("results").getInt("id"));
             mCallback.bookmarkFinish(object.getJSONObject("results").getInt("id"));
         } catch (JSONException e) {
             e.printStackTrace();

@@ -8,12 +8,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -27,6 +29,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.Window;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -151,7 +154,8 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                         // new push notification is received
                         message = intent.getStringExtra("message");
                         title = intent.getStringExtra("title");
-                        if(title != ""){
+                        Log.d("wwwwwwwwwwww","asdasdasdsadsad   "+message+"    "+title);
+                        if(!title.equals("0")){
                             AlertDialog.Builder builder =
                                     new AlertDialog.Builder(MainMenuActivity.this);
                             builder.setMessage(message);
@@ -159,12 +163,22 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                             builder.setNegativeButton("ปิด", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
+                                    Log.d("sssssssssssssss",""+currentPage);
 
                                 }
                             });
+                            builder.setCancelable(false);
                             builder.show();
+
                         }
-                        reload();
+                        checkAppointment();
+                        checkQueue();
+                        checkProcess();
+                        checkStatusInProccess();
+                        if(currentPage == 0){
+                            home.onReload();
+                        }
+
 
                     }
                 }
@@ -250,7 +264,10 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             adapter.addFragment(home,"Home");
             currentPage = 0;
             mViewPage.setAdapter(adapter);
-            reload();
+            checkAppointment();
+            checkQueue();
+            checkProcess();
+            checkStatusInProccess();
             home.onReload();
             countHome++;
         }else if(page == 1){
@@ -410,7 +427,9 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                                 tempconut = 0;
                             }
                         });
+                        builder.setCancelable(false);
                         builder.show();
+
                     }
                 }else{
                     Toast.makeText(getApplicationContext(),"Please booking in the appointment time", Toast.LENGTH_LONG).show();
@@ -471,9 +490,10 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     @Override
     public void bookmarkFinish(int queueNo) {
         this.queueNo = queueNo;
-        home.updateQueue(queueNo);
+        //home.updateQueue(queueNo);
         queue = true;
         reload();
+
     }
 
     @Override
@@ -526,6 +546,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     public void checkProcess(){
         JSONObject temp = null;
         int tempstatus = 400;
+        Log.d("aaaaaaaaaaaaaavvvvv",queueNo+"  "+ patient.getWorkflowId());
         try {
             temp = new ProcessApi(queueNo,patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=getStep").get();
             if(temp != null){
@@ -556,8 +577,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             stateDoing = "";
             targetLocation = "";
             remainQueue = 0;
-        }finally {
-
         }
     }
 
@@ -699,9 +718,28 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         stateDoing = "-";
         targetLocation = "-";
         remainQueue = 0;
-        if(currentPage == 0){
+        statusQueue = "-";
+        if(currentPage == 0) {
             home.onReload();
         }
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainMenuActivity.this);
+        builder.setTitle("ความพึงพอใจ");
+        builder.setPositiveButton("Like", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton("Dislike", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.setCancelable(false);
+        builder.create();
+        builder.show();
+
 
     }
 
