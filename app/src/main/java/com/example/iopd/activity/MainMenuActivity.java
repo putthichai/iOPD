@@ -177,8 +177,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                             checkAppointment();
                             checkQueue();
                             checkProcess();
-                            if(queueNo != 0)
-                                checkStatusInProccess();
+                            checkStatusInProccess();
                             if(currentPage == 0){
                                 home.onReload();
                             }
@@ -316,40 +315,35 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                tempStatus = temp.getInt("status");
                if(tempStatus == 200){
                    JSONObject temp2 = temp.getJSONObject("results");
-                   tempQueueNo = temp2.getInt("id");
-                   tempStatusQueue = temp2.getString("status_name");
                    int tempFinsih = temp2.getInt("statusId");
                    if(tempFinsih == 5){
                        tempconut = 1;
-                       tempQueueNo = 0;
                        queue = false;
                        stateDoing = "-";
                        targetLocation = "-";
                        remainQueue = 0;
-                       tempStatusQueue = "-";
+                   }else{
+                       queueNo = temp2.getInt("id");
+                       statusQueue = temp2.getString("status_name");
                    }
-
                }else{
-                   tempQueueNo = 0;
-                   tempStatusQueue = "-";
+                   queueNo = 0;
+                   statusQueue = "-";
                }
            }
 
         } catch (InterruptedException e) {
             e.printStackTrace();
-            tempQueueNo = 0;
-            tempStatusQueue = "-";
+            this.queueNo = 0;
+            statusQueue = "-";
         } catch (ExecutionException e) {
             e.printStackTrace();
-            tempQueueNo = 0;
-            tempStatusQueue = "-";
+            this.queueNo = 0;
+            statusQueue = "-";
         } catch (JSONException e) {
             e.printStackTrace();
-            tempQueueNo = 0;
-            tempStatusQueue = "-";
-        } finally {
-                this.queueNo = tempQueueNo;
-                statusQueue = tempStatusQueue;
+            this.queueNo = 0;
+            statusQueue = "-";
         }
     }
 
@@ -540,38 +534,41 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     }
 
     public void checkProcess(){
-        JSONObject temp = null;
-        int tempstatus = 400;
-        try {
-            temp = new ProcessApi(queueNo,patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=getStep").get();
-            if(temp != null){
-                tempstatus = temp.getInt("status");
-                if(tempstatus == 200){
-                    stateDoing = temp.getJSONObject("results").getString("step");
-                    targetLocation = temp.getJSONObject("results").getString("targetPlace");
-                    remainQueue = temp.getJSONObject("results").getInt("remainQueue");
+        if(queue == true){
+            JSONObject temp = null;
+            int tempstatus = 400;
+            try {
+                temp = new ProcessApi(queueNo,patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=getStep").get();
+                if(temp != null){
+                    tempstatus = temp.getInt("status");
+                    if(tempstatus == 200){
+                        stateDoing = temp.getJSONObject("results").getString("step");
+                        targetLocation = temp.getJSONObject("results").getString("targetPlace");
+                        remainQueue = temp.getJSONObject("results").getInt("remainQueue");
+                    }
+                }else{
+                    stateDoing = "-";
+                    targetLocation = "-";
+                    remainQueue = 0;
                 }
-            }else{
-                stateDoing = "-";
-                targetLocation = "-";
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                stateDoing = "";
+                targetLocation = "";
+                remainQueue = 0;
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+                stateDoing = "";
+                targetLocation = "";
+                remainQueue = 0;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                stateDoing = "";
+                targetLocation = "";
                 remainQueue = 0;
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            stateDoing = "";
-            targetLocation = "";
-            remainQueue = 0;
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            stateDoing = "";
-            targetLocation = "";
-            remainQueue = 0;
-        } catch (JSONException e) {
-            e.printStackTrace();
-            stateDoing = "";
-            targetLocation = "";
-            remainQueue = 0;
         }
+
     }
 
     public void turnOnGPS(){
@@ -751,6 +748,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             if(queueNo != 0){
                 Log.d("aaaaaaaaaaaaaaaaaaaaaa","aaaaaaaaaaaaaabbbbbbbbbbbbb");
                 status = new CheckStatusInProcess(queueNo).execute("https://iopdapi.ml/?function=checkStatusInProcess").get();
+                Log.d("aaaaaaaaaaaaaaaaaaaaaa","aaaaaaaaaaaaaabbbbbbbbbbbbb"+status);
                 if(status == false ){
                     finishProcess();
                 }

@@ -72,8 +72,7 @@ public class getQueue extends AsyncTask<String,String, JSONObject> {
             e.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
-        }finally {
-            return jsonObject;
         }
+        return null;
     }
 }
