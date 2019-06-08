@@ -58,7 +58,10 @@ public class CheckStatusInProcess extends AsyncTask<String, Integer, Boolean> {
             wr.close();
             reader.close();
             JSONObject jobj = new JSONObject(sb.toString());
-            return  jobj.getBoolean("results");
+            if(jobj.getInt("status") == 200){
+                return  jobj.getBoolean("results");
+            }
+
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
