@@ -697,6 +697,25 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     public void finishProcess(){
         turnOffGPS();
         checkAppointment();
+        if(queueNo != 0){
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainMenuActivity.this);
+            builder.setTitle("ความพึงพอใจ");
+            builder.setPositiveButton("Like", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.setNegativeButton("Dislike", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            builder.setCancelable(false);
+            builder.create();
+            builder.show();
+        }
         queueNo = 0;
         queue = false;
         stateDoing = "-";
@@ -706,25 +725,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         if(currentPage == 0) {
             home.onReload();
         }
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainMenuActivity.this);
-        builder.setTitle("ความพึงพอใจ");
-        builder.setPositiveButton("Like", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        builder.setNegativeButton("Dislike", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        builder.setCancelable(false);
-        builder.create();
-        builder.show();
-
-
     }
 
     public void checkStatusInProccess(){
