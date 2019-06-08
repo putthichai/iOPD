@@ -172,11 +172,11 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                         checkAppointment();
                         checkQueue();
                         checkProcess();
+                        if(queueNo != 0)
                         checkStatusInProccess();
                         if(currentPage == 0){
                             home.onReload();
                         }
-
 
                     }
                 }
@@ -697,7 +697,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     public void finishProcess(){
         turnOffGPS();
         checkAppointment();
-        Log.d("aaaaaaaaaaaaaa",""+queueNo);
+        Log.d("aaaaaaaaaaaaaa","aaaaaaaaaaaaaaaaaaa "+queueNo);
         if(queueNo != 0){
             AlertDialog.Builder builder = new AlertDialog.Builder(MainMenuActivity.this);
             builder.setTitle("ความพึงพอใจ");
@@ -742,6 +742,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         Boolean status = false;
         try {
             if(queueNo != 0){
+                Log.d("aaaaaaaaaaaaaaaaaaaaaa","aaaaaaaaaaaaaabbbbbbbbbbbbb");
                 status = new CheckStatusInProcess(queueNo).execute("https://iopdapi.ml/?function=checkStatusInProcess").get();
                 if(status == false ){
                     finishProcess();
