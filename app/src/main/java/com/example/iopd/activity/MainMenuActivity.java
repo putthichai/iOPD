@@ -136,6 +136,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             remainQueue = 0;
             message = "";
             title = "";
+            statusQueue= "-";
 
             //create notification
             mRegistrationBroadcastReceiver = new BroadcastReceiver() {
@@ -152,6 +153,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
                     } else if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
                         // new push notification is received
+                        Log.d("aaaaaaaaaaaaaaaaaaaaaaa","bbbbbbbbbbbbbbbbbbbbbbbb");
                         message = intent.getStringExtra("message");
                         title = intent.getStringExtra("title");
                         if(!title.equals("0")){
@@ -167,23 +169,23 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                                     checkProcess();
                                     dialog.dismiss();
                                     if(queueNo != 0) checkStatusInProccess();
+                                    if(currentPage == 0){
+                                        home.onReload();
+                                    }
 
                                 }
                             });
                             builder.setCancelable(false);
                             builder.show();
 
-                        }else{
-                            checkAppointment();
-                            checkQueue();
-                            checkProcess();
-                            checkStatusInProccess();
-                            if(currentPage == 0){
-                                home.onReload();
-                            }
                         }
-
-
+                        checkAppointment();
+                        checkQueue();
+                        checkProcess();
+                        checkStatusInProccess();
+                        if(currentPage == 0){
+                            home.onReload();
+                        }
                     }
                 }
             };
@@ -325,13 +327,16 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                    }else{
                        queueNo = temp2.getInt("id");
                        statusQueue = temp2.getString("status_name");
+                       queue = true;
                    }
                }else{
                    queueNo = 0;
                    statusQueue = "-";
                }
+           }else{
+               queueNo = 0;
+               statusQueue = "-";
            }
-
         } catch (InterruptedException e) {
             e.printStackTrace();
             this.queueNo = 0;
@@ -593,7 +598,8 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                if(countLocation == 0 && queueNo == 0 && isInternetConnection()){
+                Log.d("aaaaaaaaaaaaaa","la "+location.getLatitude()+"  long "+location.getLongitude());
+                if(countLocation == 0 && queueNo == 0 && isInternetConnection() && queue == false){
                     new CallApi(location.getLatitude(),location.getLongitude(),MainMenuActivity.this).execute("CheckInArea");
                     countLocation++;
                 }
@@ -622,9 +628,10 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     }
 
     public void turnOffGPS(){
-
+        countLocation = 0;
         if(currentPage == 5){
             settingFragment.checkStatusGPS(false);
+
         }
         if(locationListener != null && locationManager != null){
             locationManager.removeUpdates(locationListener);
@@ -714,6 +721,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                     targetLocation = "-";
                     remainQueue = 0;
                     statusQueue = "-";
+                    countLocation = 0;
                     if(currentPage == 0) {
                         home.onReload();
                     }
@@ -729,6 +737,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                     targetLocation = "-";
                     remainQueue = 0;
                     statusQueue = "-";
+                    countLocation = 0;
                     if(currentPage == 0) {
                         home.onReload();
                     }

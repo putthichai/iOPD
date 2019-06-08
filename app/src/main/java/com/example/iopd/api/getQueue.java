@@ -63,7 +63,7 @@ public class getQueue extends AsyncTask<String,String, JSONObject> {
             wr.close();
             reader.close();
             jsonObject = new JSONObject(sb.toString());
-
+            return jsonObject;
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
