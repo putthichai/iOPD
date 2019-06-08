@@ -697,18 +697,37 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     public void finishProcess(){
         turnOffGPS();
         checkAppointment();
+        Log.d("aaaaaaaaaaaaaa",""+queueNo);
         if(queueNo != 0){
             AlertDialog.Builder builder = new AlertDialog.Builder(MainMenuActivity.this);
             builder.setTitle("ความพึงพอใจ");
             builder.setPositiveButton("Like", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    queueNo = 0;
+                    queue = false;
+                    stateDoing = "-";
+                    targetLocation = "-";
+                    remainQueue = 0;
+                    statusQueue = "-";
+                    if(currentPage == 0) {
+                        home.onReload();
+                    }
                     dialog.dismiss();
                 }
             });
             builder.setNegativeButton("Dislike", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    queueNo = 0;
+                    queue = false;
+                    stateDoing = "-";
+                    targetLocation = "-";
+                    remainQueue = 0;
+                    statusQueue = "-";
+                    if(currentPage == 0) {
+                        home.onReload();
+                    }
                     dialog.cancel();
                 }
             });
@@ -716,15 +735,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             builder.create();
             builder.show();
         }
-        queueNo = 0;
-        queue = false;
-        stateDoing = "-";
-        targetLocation = "-";
-        remainQueue = 0;
-        statusQueue = "-";
-        if(currentPage == 0) {
-            home.onReload();
-        }
+
     }
 
     public void checkStatusInProccess(){
