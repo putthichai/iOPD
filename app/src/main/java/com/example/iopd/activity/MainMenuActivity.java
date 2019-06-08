@@ -741,9 +741,11 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     public void checkStatusInProccess(){
         Boolean status = false;
         try {
-            if(queueNo != 0) status = new CheckStatusInProcess(queueNo).execute("https://iopdapi.ml/?function=checkStatusInProcess").get();
-            if(status == false){
-                finishProcess();
+            if(queueNo != 0){
+                status = new CheckStatusInProcess(queueNo).execute("https://iopdapi.ml/?function=checkStatusInProcess").get();
+                if(status == false ){
+                    finishProcess();
+                }
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
