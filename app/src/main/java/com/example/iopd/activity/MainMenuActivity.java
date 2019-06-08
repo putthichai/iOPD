@@ -405,6 +405,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                             public void onClick(DialogInterface dialog, int id) {
                                 new BookmarkQueue(patient.getId(),patient.getRoomId(),patient.getAppointmentId(),patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=addQueue");
                                 Toast.makeText(getApplicationContext(), "คุณทำการจองคิวสำเร็จ", Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
                             }
                         });
                         builder.setNegativeButton("ยกเลิก", new DialogInterface.OnClickListener() {
@@ -414,6 +415,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                                 StatusGPS = false;
                                 countLocation = 0;
                                 tempconut = 0;
+                                dialog.cancel();
                             }
                         });
                         builder.setCancelable(false);
@@ -804,7 +806,4 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         }
 
     }
-
-
-
 }
