@@ -77,7 +77,6 @@ public class CallApi extends AsyncTask<String, Void, JSONObject> {
                 // Read Server Response
                 while ((line = reader.readLine()) != null) {
                     // Append server response in string
-                    // Log.d(TAG,"bbbbbb loop "+line+"\n");
                     sb.append(line + "\n");
                 }
 
@@ -92,16 +91,12 @@ public class CallApi extends AsyncTask<String, Void, JSONObject> {
                 if (jobj.getJSONObject("results").getString("date").equals(formattedDate)) {
                     appointmentid = jobj.getJSONObject("results").getInt("id");
                     employeeid = jobj.getJSONObject("results").getInt("employeeId");
-                    Log.d(TAG, "asasas  " + appointmentid + "    " + employeeid);
                     return jobj;
                 } else {
                     appointmentid = -1;
                     return jobj;
                 }
             } else if (function == "CheckInArea") {
-
-                // Log.d(TAG,"lllllll strat check in area la"+latitude+"   long"+longtitude);
-
                 String data = URLEncoder.encode("latpatient", "UTF-8")
                         + "=" + URLEncoder.encode(String.valueOf(latitude), "UTF-8");
 
@@ -157,7 +152,6 @@ public class CallApi extends AsyncTask<String, Void, JSONObject> {
 
     @Override
     protected void onPostExecute(JSONObject object) {
-        Log.d("cccccccccccccccc", "bbbbbbb End CallApi function " + function);
         if (function == "CheckInArea") {
             Boolean temp = false;
             try {

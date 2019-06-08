@@ -3,14 +3,12 @@ package com.example.iopd.activity;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Switch;
 
 import com.example.iopd.R;
-import com.example.iopd.activity.MainMenuActivity;
 
 import androidx.cardview.widget.CardView;
 
@@ -47,12 +45,10 @@ public class SettingFragment extends Fragment {
                     ((MainMenuActivity)getActivity()).turnOnGPS();
                     gps.setTextOn("On");
                     ((MainMenuActivity)getActivity()).setStatusGPS(true);
-                    Log.d("ssssssssssssssssss","On");
                 }else{
                     ((MainMenuActivity)getActivity()).turnOffGPS();
                     gps.setTextOff("Off");
                     ((MainMenuActivity)getActivity()).setStatusGPS(false);
-                    Log.d("ssssssssssssssssss","Off");
                 }
             }
         });

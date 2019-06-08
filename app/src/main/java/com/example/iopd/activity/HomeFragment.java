@@ -142,7 +142,6 @@ public class HomeFragment extends Fragment{
     }
 
     protected void setAppointment(String tempDate){
-        Log.d("aaaaaaaaaaaaaaa",tempDate+"    "+date.toString());
         date.setText(tempDate);
     }
 
@@ -160,7 +159,6 @@ public class HomeFragment extends Fragment{
 
     protected  void onReload(){
         Patient patient = ((MainMenuActivity)getActivity()).getPatient();
-        Log.d("aaaaaaaaaaaaaaaaaaaaaa",patient.toString());
         setAppointment(patient.getAppointment());
         setTime(patient.getTimeStart(),patient.getTimeEnd());
         updateQueue(((MainMenuActivity)getActivity()).getQueueNo());

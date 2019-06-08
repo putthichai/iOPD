@@ -154,7 +154,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                         // new push notification is received
                         message = intent.getStringExtra("message");
                         title = intent.getStringExtra("title");
-                        Log.d("wwwwwwwwwwww","asdasdasdsadsad   "+message+"    "+title);
                         if(!title.equals("0")){
                             AlertDialog.Builder builder =
                                     new AlertDialog.Builder(MainMenuActivity.this);
@@ -163,8 +162,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                             builder.setNegativeButton("ปิด", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Log.d("sssssssssssssss",""+currentPage);
-
+                                    dialog.cancel();
                                 }
                             });
                             builder.setCancelable(false);
@@ -290,13 +288,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             mViewPage.setAdapter(adapter);
             callAllProcess();
             countHome = 0;
-        }else if(page == 4){
-            //mViewPage.removeAllViews();
-            //SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
-            //adapter.addFragment(new Place2Fragment(),"Progress");
-            //mViewPage.setAdapter(adapter);
-            //currentPage = 4;
-            countHome = 0;
         }else if(page == 5){
             currentPage = 5;
             SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager());
@@ -315,12 +306,10 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         try {
             temp = new getQueue(patient.getId(),patient.getWorkflowId()).execute("https://iopdapi.ml/?function=getQueueByPatientId").get();
            if(temp != null){
-               Log.d("xxxxxxxxxxxxx",temp.toString());
                tempStatus = temp.getInt("status");
                if(tempStatus == 200){
                    JSONObject temp2 = temp.getJSONObject("results");
                    tempQueueNo = temp2.getInt("id");
-                   Log.d("qqqqqqqqqqqqqqqqqqq",""+tempQueueNo);
                    tempStatusQueue = temp2.getString("status_name");
                    int tempFinsih = temp2.getInt("statusId");
                    if(tempFinsih == 5){
@@ -441,7 +430,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                 turnOffGPS();
             }
         }
-
     }
 
     @Override
@@ -498,7 +486,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
 
     @Override
     public void checkIn(Boolean statue) {
-        Log.d("cccccccccccccccc",""+statue);
         if(statue && haveNetwork()){
             bookmarkQueue();
         }else if(!haveNetwork()){
@@ -546,11 +533,9 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     public void checkProcess(){
         JSONObject temp = null;
         int tempstatus = 400;
-        Log.d("aaaaaaaaaaaaaavvvvv",queueNo+"  "+ patient.getWorkflowId());
         try {
             temp = new ProcessApi(queueNo,patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=getStep").get();
             if(temp != null){
-                Log.d("aaaaaaaaaaaaaa",temp.toString());
                 tempstatus = temp.getInt("status");
                 if(tempstatus == 200){
                     stateDoing = temp.getJSONObject("results").getString("step");
@@ -602,9 +587,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                Log.d("cccccccccccccccc","bbbbbbb in onLocationChanged function");
                 if(countLocation == 0 && queueNo == 0 && isInternetConnection()){
-                    //Log.d("cccccccccccccccc","bbbbbbb start to check in area");
                     new CallApi(location.getLatitude(),location.getLongitude(),MainMenuActivity.this).execute("CheckInArea");
                     countLocation++;
                 }
@@ -702,7 +685,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         } catch (JSONException e) {
             e.printStackTrace();
         }finally {
-            Log.d("aaaaaaaaaaaaaaaaaa","status "+tempStatus);
             if(temp != null && tempStatus == 200){
                 right.setText(processName);
             }
@@ -814,7 +796,6 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         checkAppointment();
         checkQueue();
         checkProcess();
-        checkStatusInProccess();
         if(currentPage == 0){
             home.onReload();
         }

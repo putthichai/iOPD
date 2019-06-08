@@ -35,11 +35,7 @@ public class BookmarkQueue extends AsyncTask<String, Void, JSONObject> {
     @Override
     protected JSONObject doInBackground(String... strings) {
         try {
-            //Log.d(TAG,"222222222   roomId "+roomId+" appoint "+appointmentId);
-
             if(roomId == 0 || appointmentId == 0) return null;
-
-           // Log.d(TAG,"222222222 pass   roomId "+roomId+" appoint "+appointmentId);
             String data = URLEncoder.encode("patient_id", "UTF-8")
                     + "=" + URLEncoder.encode(String.valueOf(patientId), "UTF-8");
 
@@ -90,8 +86,6 @@ public class BookmarkQueue extends AsyncTask<String, Void, JSONObject> {
             wr.close();
 
             JSONObject jobj = new JSONObject(sb.toString());
-            //queueNo = jobj.getInt("queueNo");
-           // Log.d("333333","3333333   "+queueNo);
             return jobj;
         }
         catch(Exception ex)
@@ -105,7 +99,6 @@ public class BookmarkQueue extends AsyncTask<String, Void, JSONObject> {
     @Override
     protected void onPostExecute(JSONObject object) {
         try {
-            Log.d("llllllllllll",""+object.getJSONObject("results").getInt("id"));
             mCallback.bookmarkFinish(object.getJSONObject("results").getInt("id"));
         } catch (JSONException e) {
             e.printStackTrace();

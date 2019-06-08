@@ -100,7 +100,6 @@ public class LoginActivity extends AppCompatActivity implements iOPD2 {
                 sessionManager.createLoginSession(tempFirst,tempSur,String.valueOf(tempId));
                 String refreshedToken = FirebaseInstanceId.getInstance().getToken();
                 SharedPrefManager.getInstance(getApplicationContext()).saveDeviceToken(refreshedToken);
-                Log.d("444444444444444","id  "+tempId+"  "+refreshedToken);
                 new updateTokenToServer(tempId,refreshedToken).execute("https://iopdapi.ml/?function=updatePatientToken");
                 Intent intent = new Intent(LoginActivity.this, MainMenuActivity.class);
                 startActivity(intent);

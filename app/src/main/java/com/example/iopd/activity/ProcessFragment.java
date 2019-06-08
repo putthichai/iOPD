@@ -3,7 +3,6 @@ package com.example.iopd.activity;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +37,6 @@ public class ProcessFragment extends Fragment {
     }
 
     protected void setProcess(String[] process,int[] order){
-        Log.d("oooooaaaaa",""+process.length+"     "+order.length);
         CustomAdapter adapter = new CustomAdapter(root.getContext(), process, order);
         listView.setAdapter(adapter);
         adapter = null;

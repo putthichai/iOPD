@@ -2,13 +2,9 @@ package com.example.iopd.api;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
-
 import com.example.iopd.activity.iOPD;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -69,7 +65,6 @@ public class AllProcessesApi extends AsyncTask<String, Integer, JSONObject> {
             conn.disconnect();
             wr.close();
             reader.close();
-            Log.d("22222222222",sb.toString());
             JSONObject jobj = new JSONObject(sb.toString());
 
             return  jobj;
