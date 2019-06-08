@@ -162,21 +162,28 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                             builder.setNegativeButton("ปิด", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    dialog.cancel();
+                                    checkAppointment();
+                                    checkQueue();
+                                    checkProcess();
+                                    dialog.dismiss();
+                                    if(queueNo != 0) checkStatusInProccess();
+
                                 }
                             });
                             builder.setCancelable(false);
                             builder.show();
 
+                        }else{
+                            checkAppointment();
+                            checkQueue();
+                            checkProcess();
+                            if(queueNo != 0)
+                                checkStatusInProccess();
+                            if(currentPage == 0){
+                                home.onReload();
+                            }
                         }
-                        checkAppointment();
-                        checkQueue();
-                        checkProcess();
-                        if(queueNo != 0)
-                        checkStatusInProccess();
-                        if(currentPage == 0){
-                            home.onReload();
-                        }
+
 
                     }
                 }
