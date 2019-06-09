@@ -755,13 +755,12 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         Boolean status = false;
         try {
             if(queueNo != 0){
-<<<<<<< HEAD
+
                 status = new CheckStatusInProcess(queueNo).execute("http://iopd.tk:81/?function=checkStatusInProcess").get();
-=======
+
                 Log.d("aaaaaaaaaaaaaaaaaaaaaa","aaaaaaaaaaaaaabbbbbbbbbbbbb");
-                status = new CheckStatusInProcess(queueNo).execute("https://iopdapi.ml/?function=checkStatusInProcess").get();
-                Log.d("aaaaaaaaaaaaaaaaaaaaaa","aaaaaaaaaaaaaabbbbbbbbbbbbb"+status);
->>>>>>> parent of 09f3f6f... clean code some part
+
+
                 if(status == false ){
                     finishProcess();
                 }
