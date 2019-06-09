@@ -100,7 +100,7 @@ public class LoginActivity extends AppCompatActivity implements iOPD2 {
                 sessionManager.createLoginSession(tempFirst,tempSur,String.valueOf(tempId));
                 String refreshedToken = FirebaseInstanceId.getInstance().getToken();
                 SharedPrefManager.getInstance(getApplicationContext()).saveDeviceToken(refreshedToken);
-                new updateTokenToServer(tempId,refreshedToken).execute("https://iopdapi.ml/?function=updatePatientToken");
+                new updateTokenToServer(tempId,refreshedToken).execute("http://iopd.tk:81/?function=updatePatientToken");
                 Intent intent = new Intent(LoginActivity.this, MainMenuActivity.class);
                 startActivity(intent);
                 finish();
@@ -146,7 +146,7 @@ public class LoginActivity extends AppCompatActivity implements iOPD2 {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            new LoginApi(LoginActivity.this,id,pw).execute("https://iopdapi.ml/?function=loginPatient");
+            new LoginApi(LoginActivity.this,id,pw).execute("http://iopd.tk:81/?function=loginPatient");
         }
 
     }

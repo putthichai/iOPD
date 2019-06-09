@@ -88,7 +88,7 @@ public class AppointmentApi extends AsyncTask<String, Integer, JSONObject> {
         String result = "";
         URL url = null;
         try {
-            url = new URL("https://iopdapi.ml/?function=getWorkflow");
+            url = new URL("http://iopd.tk:81/?function=getWorkflow");
             String data = URLEncoder.encode("workflowId", "UTF-8")
                     + "=" + URLEncoder.encode(String.valueOf(anInt), "UTF-8");
 

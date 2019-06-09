@@ -117,7 +117,7 @@ public class RegisterActivity extends AppCompatActivity implements iOPD2 {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            new RegisterApi(RegisterActivity.this,name,surname,id,pw,email).execute("https://iopdapi.ml/?function=registerPatient");
+            new RegisterApi(RegisterActivity.this,name,surname,id,pw,email).execute("http://iopd.tk:81/?function=registerPatient");
         }
     }
 

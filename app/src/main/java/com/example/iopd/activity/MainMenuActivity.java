@@ -264,7 +264,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         JSONObject temp = null;
         int tempStatus = 400;
         try {
-            temp = new getQueue(patient.getId(),patient.getWorkflowId()).execute("https://iopdapi.ml/?function=getQueueByPatientId").get();
+            temp = new getQueue(patient.getId(),patient.getWorkflowId()).execute("http://iopd.tk:81/?function=getQueueByPatientId").get();
            if(temp != null){
                tempStatus = temp.getInt("status");
                if(tempStatus == 200){
@@ -359,7 +359,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
                         builder.setMessage("คุณต้องการจองคิวมั้ยคะ?");
                         builder.setPositiveButton("ตกลง", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                new BookmarkQueue(patient.getId(),patient.getRoomId(),patient.getAppointmentId(),patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=addQueue");
+                                new BookmarkQueue(patient.getId(),patient.getRoomId(),patient.getAppointmentId(),patient.getWorkflowId(),MainMenuActivity.this).execute("http://iopd.tk:81/?function=addQueue");
                                 Toast.makeText(getApplicationContext(), "คุณทำการจองคิวสำเร็จ", Toast.LENGTH_SHORT).show();
                                 dialog.dismiss();
                             }
@@ -478,7 +478,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         queueSession.clearSession();
         sessionManager.logout();
         SharedPrefManager.getInstance(this).deleteDeviceToken();
-        new updateTokenToServer(patient.getId()," ").execute("https://iopdapi.ml/?function=updatePatientToken");
+        new updateTokenToServer(patient.getId()," ").execute("http://iopd.tk:81/?function=updatePatientToken");
     }
 
     public void checkProcess(){
@@ -486,7 +486,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
             JSONObject temp = null;
             int tempstatus = 400;
             try {
-                temp = new ProcessApi(queueNo,patient.getWorkflowId(),MainMenuActivity.this).execute("https://iopdapi.ml/?function=getStep").get();
+                temp = new ProcessApi(queueNo,patient.getWorkflowId(),MainMenuActivity.this).execute("http://iopd.tk:81/?function=getStep").get();
                 if(temp != null){
                     tempstatus = temp.getInt("status");
                     if(tempstatus == 200){
@@ -577,7 +577,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
     public void callAllProcess(){
        if(isInternetConnection()) {
            try {
-               JSONObject temp = new AllProcessesApi(queueNo, patient.getWorkflowId(), MainMenuActivity.this).execute("https://iopdapi.ml/?function=checkStateInProcess").get();
+               JSONObject temp = new AllProcessesApi(queueNo, patient.getWorkflowId(), MainMenuActivity.this).execute("http://iopd.tk:81/?function=checkStateInProcess").get();
                if (temp != null) {
                    if (temp.getInt("status") == 200) {
                        int tempNum = temp.getJSONArray("results").length();
@@ -611,7 +611,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         String date = "";
         String processName = "";
         try {
-            temp = new AppointmentApi(MainMenuActivity.this,patient.getId()).execute("https://iopdapi.ml/?function=getAppointmentByPatientsId").get();
+            temp = new AppointmentApi(MainMenuActivity.this,patient.getId()).execute("http://iopd.tk:81/?function=getAppointmentByPatientsId").get();
             if(temp != null){
                 tempStatus = temp.getInt("status");
                 if(tempStatus == 200){
@@ -686,7 +686,7 @@ public class MainMenuActivity extends AppCompatActivity implements iOPD {
         Boolean status = false;
         try {
             if(queueNo != 0){
-                status = new CheckStatusInProcess(queueNo).execute("https://iopdapi.ml/?function=checkStatusInProcess").get();
+                status = new CheckStatusInProcess(queueNo).execute("http://iopd.tk:81/?function=checkStatusInProcess").get();
                 if(status == false ){
                     finishProcess();
                 }
